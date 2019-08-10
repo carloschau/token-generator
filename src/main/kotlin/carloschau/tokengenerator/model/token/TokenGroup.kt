@@ -8,10 +8,11 @@ import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
+import javax.annotation.Generated
 import javax.crypto.SecretKey
 
 class TokenGroup (
-    var Id: String = "",
+    var Id: String? = null,
     var name : String = "",
     var owner : Nothing? = null,
     var numberOfTokenIssued : Int = 0,
@@ -30,7 +31,7 @@ class TokenGroup (
                 maxTokenIssuance,
                 effectiveDate,
                 expiryDate,
-                uuid?.let { UuidUtil.toStandardBinaryUUID(it) },
+                uuid?.let{ UuidUtil.toStandardBinaryUUID(it) },
                 Binary(signingKey?.encoded)
         )
     }
@@ -47,7 +48,7 @@ class TokenGroup (
                     dao.effectDate,
                     dao.expiryDate,
                     dao.uuid?.let { UuidUtil.fromStandardBinaryUUID(it) },
-                    Keys.hmacShaKeyFor(dao.signingKey?.data)
+                    dao.signingKey?.data?.let {  Keys.hmacShaKeyFor(it) }
                 )
             }
         }
@@ -56,7 +57,14 @@ class TokenGroup (
 }
 
 @Document(collection = "tokenGroups")
-data class TokenGroupDao(@Id var Id: String, var name: String, var owner: Nothing? = null,
-                         var numberOfTokenIssued: Int = 0, var maxTokenIssuance: Int = 0,
-                         var effectDate : Date? = null, var expiryDate : Date? = null,
-                         var uuid : Binary? = null, var signingKey : Binary? = null)
+data class TokenGroupDao(
+        @Id
+        var Id: String? = null,
+        var name: String = "",
+        var owner: Nothing? = null,
+        var numberOfTokenIssued: Int = 0,
+        var maxTokenIssuance: Int = 0,
+        var effectDate: Date? = null,
+        var expiryDate : Date? = null,
+        var uuid: Binary? = null,
+        var signingKey : Binary? = null)

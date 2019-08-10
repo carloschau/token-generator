@@ -49,4 +49,13 @@ class TokenGenerationService{
         else
             return TokenDto()
     }
+
+    fun createTokenGroup(name : String){
+        val tokenGroup = TokenGroup()
+        tokenGroup.name = name
+        tokenGroup.uuid = UUID.randomUUID()
+        tokenGroup.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+
+        tokenGroupRepository.save(tokenGroup.toDao())
+    }
 }
