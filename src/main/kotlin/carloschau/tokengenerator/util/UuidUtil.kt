@@ -1,14 +1,16 @@
 package carloschau.tokengenerator.util
 import org.bson.BsonBinary
 import org.bson.types.Binary
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.nio.ByteBuffer
 import java.util.*
 import java.util.UUID
 import kotlin.experimental.and
 
 
 object UuidUtil {
-    val logger = LoggerFactory.getLogger(javaClass)
+    private  val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     fun fromStringWithoutDash(name: String) : UUID
     {
@@ -17,6 +19,15 @@ object UuidUtil {
         logger.info(uuidWithDash)
         return UUID.fromString(uuidWithDash)
     }
+
+    fun toBytes(uuid : UUID) : ByteArray
+    {
+        val bb = ByteBuffer.wrap(ByteArray(16))
+        bb.putLong(uuid.mostSignificantBits)
+        bb.putLong(uuid.leastSignificantBits)
+        return bb.array()
+    }
+
 
     /**
      * Convert a UUID object to a Binary with a subtype 0x04

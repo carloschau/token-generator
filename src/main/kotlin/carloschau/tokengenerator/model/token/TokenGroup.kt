@@ -1,5 +1,6 @@
 package carloschau.tokengenerator.model.token
 
+import carloschau.tokengenerator.dto.model.token.TokenGroupDto
 import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.security.Keys
 import org.bson.BsonBinary
@@ -22,8 +23,21 @@ class TokenGroup (
     var uuid : UUID? = null,
     var signingKey : SecretKey? = null
 ){
-    fun toDao() : TokenGroupDao{
-        return TokenGroupDao(
+    val toDao get()  =
+        TokenGroupDao(
+            Id,
+            name,
+            owner,
+            numberOfTokenIssued,
+            maxTokenIssuance,
+            effectiveDate,
+            expiryDate,
+            uuid?.let { UuidUtil.toBytes(it) }?.let { Binary(it) },
+            Binary(signingKey?.encoded)
+        )
+
+    val toDto get() =
+        TokenGroupDto(
                 Id,
                 name,
                 owner,
@@ -31,10 +45,9 @@ class TokenGroup (
                 maxTokenIssuance,
                 effectiveDate,
                 expiryDate,
-                uuid?.let{ UuidUtil.toStandardBinaryUUID(it) },
-                Binary(signingKey?.encoded)
+                uuid?.toString(),
+                signingKey?.encoded.let { Base64.getEncoder().encodeToString(it) }
         )
-    }
 
     companion object{
         fun fromDao(dao : TokenGroupDao?) : TokenGroup?{
@@ -47,7 +60,7 @@ class TokenGroup (
                     dao.maxTokenIssuance,
                     dao.effectDate,
                     dao.expiryDate,
-                    dao.uuid?.let { UuidUtil.fromStandardBinaryUUID(it) },
+                    dao.uuid?.let { UUID.nameUUIDFromBytes(it.data) },
                     dao.signingKey?.data?.let {  Keys.hmacShaKeyFor(it) }
                 )
             }

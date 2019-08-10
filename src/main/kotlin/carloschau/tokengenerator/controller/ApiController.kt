@@ -1,6 +1,8 @@
 package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.dto.model.token.TokenDto
+import carloschau.tokengenerator.dto.model.token.TokenGroupDto
+import carloschau.tokengenerator.model.token.TokenGroup
 import carloschau.tokengenerator.service.TokenGenerationService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,5 +26,11 @@ class ApiController {
     fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroupRequest)
     {
         tokenGenerationService.createTokenGroup(request.name)
+    }
+
+    @GetMapping("/api/tokengroup")
+    fun getAllTokenGroups() : List<TokenGroupDto>
+    {
+        return tokenGenerationService.findAllTokenGroup()
     }
 }
