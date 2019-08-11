@@ -29,7 +29,6 @@ class TokenGenerationService{
 
     fun getToken(uuidStr: String): TokenDto {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
-        val bsonUUID = UuidUtil.toStandardBinaryUUID(uuid);
         val tokenGroup = TokenGroup.fromDao(tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid))))
         logger?.info(tokenGroup?.Id?:"Not Found")
 
@@ -55,10 +54,13 @@ class TokenGenerationService{
     }
 
     fun createTokenGroup(name : String){
+        val ownerId = "5d5010cf2b7a9e3de0b4ff47" //TODO: Get userId of current user
+
         val tokenGroup = TokenGroup().apply {
             this.name = name
             this.uuid = UUID.randomUUID()
             this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+            this.owner_Id = ownerId
         }
 
         logger?.info("Token group uuid created: ${ tokenGroup.uuid }")

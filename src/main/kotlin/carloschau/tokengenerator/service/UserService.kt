@@ -6,7 +6,6 @@ import carloschau.tokengenerator.repository.user.UsersRepository
 import de.mkammerer.argon2.Argon2Factory
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import java.util.*
@@ -21,8 +20,6 @@ class  UserService{
 
     fun createUser(username : String, email : String, password : String){
         val random = SecureRandom()
-        val salt = ByteArray(32)
-                    .apply { random.nextBytes(this) }
 
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
         val hashedPassword = argon2.hash(2, 1024 * 1024, 4, password);

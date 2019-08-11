@@ -3,19 +3,16 @@ package carloschau.tokengenerator.model.token
 import carloschau.tokengenerator.dto.model.token.TokenGroupDto
 import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.security.Keys
-import org.bson.BsonBinary
 import org.bson.types.Binary
-import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.util.*
-import javax.annotation.Generated
 import javax.crypto.SecretKey
 
 class TokenGroup (
     var Id: String? = null,
     var name : String = "",
-    var owner : Nothing? = null,
+    var owner_Id : String? = null,
     var numberOfTokenIssued : Int = 0,
     var maxTokenIssuance : Int = 0,
     var effectiveDate : Date? = null,
@@ -27,7 +24,7 @@ class TokenGroup (
         TokenGroupDao(
             Id,
             name,
-            owner,
+            owner_Id,
             numberOfTokenIssued,
             maxTokenIssuance,
             effectiveDate,
@@ -40,7 +37,7 @@ class TokenGroup (
         TokenGroupDto(
                 Id,
                 name,
-                owner,
+                owner_Id,
                 numberOfTokenIssued,
                 maxTokenIssuance,
                 effectiveDate,
@@ -55,7 +52,7 @@ class TokenGroup (
                 TokenGroup(
                     dao.Id,
                     dao.name,
-                    dao.owner,
+                    dao.owner_Id,
                     dao.numberOfTokenIssued,
                     dao.maxTokenIssuance,
                     dao.effectDate,
@@ -74,7 +71,7 @@ data class TokenGroupDao(
         @Id
         var Id: String? = null,
         var name: String = "",
-        var owner: Nothing? = null,
+        var owner_Id: String? = null,
         var numberOfTokenIssued: Int = 0,
         var maxTokenIssuance: Int = 0,
         var effectDate: Date? = null,
