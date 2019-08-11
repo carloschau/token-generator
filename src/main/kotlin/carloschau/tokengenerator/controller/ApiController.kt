@@ -4,6 +4,7 @@ import carloschau.tokengenerator.dto.model.token.TokenDto
 import carloschau.tokengenerator.dto.model.token.TokenGroupDto
 import carloschau.tokengenerator.model.token.TokenGroup
 import carloschau.tokengenerator.service.TokenGenerationService
+import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -16,9 +17,11 @@ class ApiController {
     @Autowired
     private lateinit var tokenGenerationService : TokenGenerationService
 
+    @Autowired
+    private  lateinit var userService : UserService
+
     @GetMapping("/api/token/{uuid}")
     fun token(@PathVariable uuid: String): TokenDto {
-
         return tokenGenerationService.getToken(uuid)
     }
 
@@ -32,5 +35,11 @@ class ApiController {
     fun getAllTokenGroups() : List<TokenGroupDto>
     {
         return tokenGenerationService.findAllTokenGroup()
+    }
+
+    @PostMapping("/api/register")
+    fun createUser(@RequestBody @Valid request: CreateUserRequest)
+    {
+        userService.createUser(request.username, request.email, request.password)
     }
 }
