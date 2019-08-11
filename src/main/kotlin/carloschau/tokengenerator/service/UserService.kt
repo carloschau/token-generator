@@ -19,7 +19,6 @@ class  UserService{
     private lateinit var userRepository: UsersRepository
 
     fun createUser(username : String, email : String, password : String){
-        val random = SecureRandom()
 
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
         val hashedPassword = argon2.hash(2, 1024 * 1024, 4, password);
