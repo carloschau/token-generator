@@ -1,8 +1,7 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.dto.model.token.TokenDto
-import carloschau.tokengenerator.dto.model.token.TokenGroupDto
-import carloschau.tokengenerator.model.token.TokenGroup
+import carloschau.tokengeneratordto.model.token.TokenDto
+import carloschau.tokengeneratordto.model.token.TokenGroupDto
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory

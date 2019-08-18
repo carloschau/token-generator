@@ -1,6 +1,6 @@
 package carloschau.tokengenerator.model.token
 
-import carloschau.tokengenerator.dto.model.token.TokenGroupDto
+import carloschau.tokengeneratordto.model.token.TokenGroupDto
 import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.security.Keys
 import org.bson.types.Binary

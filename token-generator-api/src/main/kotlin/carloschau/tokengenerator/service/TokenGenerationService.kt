@@ -1,7 +1,7 @@
 package carloschau.tokengenerator.service
 
-import carloschau.tokengenerator.dto.model.token.TokenDto
-import carloschau.tokengenerator.dto.model.token.TokenGroupDto
+import carloschau.tokengeneratordto.model.token.TokenDto
+import carloschau.tokengeneratordto.model.token.TokenGroupDto
 import carloschau.tokengenerator.model.token.Token
 import carloschau.tokengenerator.model.token.TokenGroup
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
