@@ -1,10 +1,8 @@
 package carloschau.tokengenerator.util
-import org.bson.BsonBinary
 import org.bson.types.Binary
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
-import java.util.*
 import java.util.UUID
 import kotlin.experimental.and
 
@@ -32,7 +30,7 @@ object UuidUtil {
     /**
      * Convert a UUID object to a Binary with a subtype 0x04
      */
-    fun toStandardBinaryUUID(uuid: java.util.UUID): Binary {
+    fun toStandardBinaryUUID(uuid: UUID): Binary {
         var msb = uuid.mostSignificantBits
         var lsb = uuid.leastSignificantBits
 
