@@ -1,4 +1,4 @@
-package carloschau.tokengeneratordto.model.token
+package carloschau.tokengenerator.dto.model.token
 
 import java.util.*
 
