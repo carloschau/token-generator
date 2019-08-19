@@ -1,5 +1,5 @@
 {
-  "name": "admin",
+  "name": "token-generator-admin",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "core-js": "^2.6.5",
+    "portfinder": "1.0.21",
     "vue": "^2.6.10",
     "vuejs-logger": "^1.5.3"
   },
@@ -21,6 +22,9 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "vue-template-compiler": "^2.6.10"
+  },
+  "resolutions": {
+    "@vue/cli-service/portfinder": "1.0.21"
   },
   "eslintConfig": {
     "root": true,

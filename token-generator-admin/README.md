@@ -1,4 +1,4 @@
-# admin
+# token-generator-admin
 
 ## Project setup
 ```
