@@ -4,4 +4,5 @@ import carloschau.tokengenerator.model.user.UserDao
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface UsersRepository : MongoRepository<UserDao, String>{
+    fun findByEmail(email : String) : UserDao?
 }

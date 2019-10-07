@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.model.user
 
 
+import carloschau.tokengenerator.dto.model.user.UserDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -12,41 +13,51 @@ enum class UserStatus{
 }
 
 class User (
-        val Id : String? = null,
-        var username : String = "",
-        var email : String = "",
-        var passwordHash : String = "",
-        var status : UserStatus? = null,
-        var createdOn : Date? = null){
+        val Id : String?,
+        var username : String,
+        var email : String,
+        var passwordHash : String,
+        var status : UserStatus,
+        var createdOn : Date){
 
     val toDao get() = UserDao(
             Id,
             username,
             email,
             passwordHash,
-            status?.name,
+            status.name,
+            createdOn
+    )
+
+    val toDto get() = UserDto(
+            Id,
+            username,
+            email,
+            status,
             createdOn
     )
 
     companion object{
-        fun fromDao(dao : UserDao) : User{
-            return User(
+        fun fromDao(dao : UserDao?) : User?{
+            return dao?.let {
+                User(
                     dao.Id,
                     dao.username,
                     dao.email,
                     dao.passwordHash,
-                    dao.status?.let {  UserStatus.valueOf(it.toUpperCase()) },
+                    dao.status.let {  UserStatus.valueOf(it.toUpperCase()) },
                     dao.createdOn
-            )
+                )
+            }
         }
     }
 
 }
 
 @Document("users")
-data class UserDao(@Id val Id: String? = null,
+data class UserDao(@Id val Id: String?,
                    @Indexed(unique = true) val username: String,
-                   val email : String = "",
-                   val passwordHash: String = "",
-                   val status: String? = null,
-                   val createdOn : Date? = null)
+                   @Indexed(unique = true) val email : String,
+                   val passwordHash: String,
+                   val status: String,
+                   val createdOn : Date)

@@ -1,6 +1,8 @@
 package carloschau.tokengenerator.service
 
+import carloschau.tokengenerator.dto.model.user.UserDto
 import carloschau.tokengenerator.model.user.User
+import carloschau.tokengenerator.model.user.UserDao
 import carloschau.tokengenerator.model.user.UserStatus
 import carloschau.tokengenerator.repository.user.UsersRepository
 import de.mkammerer.argon2.Argon2Factory
@@ -23,15 +25,28 @@ class  UserService{
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
         val hashedPassword = argon2.hash(2, 1024 * 1024, 4, password);
 
-        val user = User().apply {
-            this.username = username
-            this.email = email
-            this.passwordHash = hashedPassword
-            this.createdOn = Date()
-            this.status = UserStatus.INACTIVE
-        }
+        val user = User(
+            null,
+            username,
+            email,
+            hashedPassword,
+            UserStatus.INACTIVE,
+            Date()
+        )
 
         userRepository.save(user.toDao)
+    }
+
+    fun authenticate(email : String, password : String) : UserDto?
+    {
+        val user = User.fromDao(userRepository.findByEmail(email))
+
+        val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
+
+        return if (user != null && argon2.verify(user.passwordHash, password))
+            user.toDto
+        else
+            null
     }
 
 }

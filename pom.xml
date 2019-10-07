@@ -4,9 +4,6 @@
 	<modelVersion>4.0.0</modelVersion>
 	<modules>
 		<module>token-generator-api</module>
-        <module>token-generator-admin</module>
-        <module>token-generator-admin</module>
-		<module>token-generator-admin</module>
 	</modules>
 	<parent>
 		<groupId>org.springframework.boot</groupId>

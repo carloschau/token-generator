@@ -1,7 +1,10 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengeneratordto.model.token.TokenDto
-import carloschau.tokengeneratordto.model.token.TokenGroupDto
+import carloschau.tokengenerator.dto.model.token.TokenDto
+import carloschau.tokengenerator.dto.model.token.TokenGroupDto
+import carloschau.tokengenerator.dto.model.user.LoginStatus
+import carloschau.tokengenerator.dto.model.user.LoginStatus.*
+import carloschau.tokengenerator.model.user.UserStatus
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory
@@ -40,5 +43,19 @@ class ApiController {
     fun createUser(@RequestBody @Valid request: CreateUserRequest)
     {
         userService.createUser(request.username, request.email, request.password)
+    }
+
+    @PostMapping("/api/login")
+    fun login(@RequestBody @Valid request : LoginRequest)
+    {
+        val user = userService.authenticate(request.email, request.password)
+        val loginStatus =
+                if (user == null) EMAIL_OR_PASSWORD_ERROR
+                else if (user.status == UserStatus.INACTIVE) INACTIVE
+                else if (user.status == UserStatus.LOCKED) ACCOUNT_LOCKED
+                else SUCCESS
+
+
+
     }
 }
