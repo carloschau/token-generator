@@ -1,7 +1,7 @@
 package carloschau.tokengenerator.service
 
-import carloschau.tokengenerator.dto.model.token.TokenDto
-import carloschau.tokengenerator.dto.model.token.TokenGroupDto
+import carloschau.tokengenerator.response.model.token.TokenDto
+import carloschau.tokengenerator.response.model.token.TokenGroupDto
 import carloschau.tokengenerator.model.token.Token
 import carloschau.tokengenerator.model.token.TokenGroup
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
@@ -27,30 +27,27 @@ class TokenGenerationService{
     @Autowired
     private lateinit var tokenRepository: TokenRepository
 
-    fun getToken(uuidStr: String): TokenDto {
+    fun getToken(uuidStr: String): Token? {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
         val tokenGroup = TokenGroup.fromDao(tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid))))
         logger?.info(tokenGroup?.Id?:"Not Found")
 
-        if (tokenGroup != null)
-        {
+        return tokenGroup?.run group@ {
             val jwtString = Jwts.builder()
                     .setHeaderParam("typ", "JWT")
                     .setHeaderParam("alg", "HS256")
                     .setIssuedAt(Date())
-                    .signWith(tokenGroup.signingKey)
+                    .signWith(this@group.signingKey)
                     .compact()
 
             val token = Token().apply {
                 this.jwt = jwtString
-                this.tokenGroup_Id = tokenGroup.Id
+                this.tokenGroup_Id = this@group.Id
             }
 
             tokenRepository.save(token)
-            return token.toDto
+            token
         }
-        else
-            return TokenDto()
     }
 
     fun createTokenGroup(name : String){
@@ -67,7 +64,7 @@ class TokenGenerationService{
         tokenGroupRepository.save(tokenGroup.toDao)
     }
 
-    fun findAllTokenGroup() : List<TokenGroupDto>{
-        return tokenGroupRepository.findAll().filterNotNull().map { TokenGroup.fromDao(it)!!.toDto }
+    fun findAllTokenGroup() : List<TokenGroup>{
+        return tokenGroupRepository.findAll().filterNotNull().map { TokenGroup.fromDao(it)!! }
     }
 }

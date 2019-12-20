@@ -1,7 +1,6 @@
 package carloschau.tokengenerator.model.user
 
 
-import carloschau.tokengenerator.dto.model.user.UserDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -26,14 +25,6 @@ class User (
             email,
             passwordHash,
             status.name,
-            createdOn
-    )
-
-    val toDto get() = UserDto(
-            Id,
-            username,
-            email,
-            status,
             createdOn
     )
 

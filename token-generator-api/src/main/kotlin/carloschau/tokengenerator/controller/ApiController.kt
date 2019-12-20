@@ -1,13 +1,10 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.dto.model.token.TokenDto
-import carloschau.tokengenerator.dto.model.token.TokenGroupDto
-import carloschau.tokengenerator.dto.model.user.LoginDto
-import carloschau.tokengenerator.dto.model.user.LoginStatus
-import carloschau.tokengenerator.dto.model.user.LoginStatus.*
+import carloschau.tokengenerator.response.model.token.TokenDto
+import carloschau.tokengenerator.response.model.token.TokenGroupDto
+import carloschau.tokengenerator.response.model.user.LoginDto
+import carloschau.tokengenerator.response.model.user.LoginStatus.*
 import carloschau.tokengenerator.exception.AuthenticationErrorException
-import carloschau.tokengenerator.exception.GeneralApiException
-import carloschau.tokengenerator.model.user.User
 import carloschau.tokengenerator.model.user.UserStatus
 import carloschau.tokengenerator.service.AuthenticationService
 import carloschau.tokengenerator.service.TokenGenerationService
@@ -15,8 +12,6 @@ import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.lang.Exception
-import java.lang.RuntimeException
 import javax.validation.Valid
 
 @RestController
@@ -34,7 +29,9 @@ class ApiController {
 
     @GetMapping("/api/token/{uuid}")
     fun token(@PathVariable uuid: String): TokenDto {
-        return tokenGenerationService.getToken(uuid)
+        with (tokenGenerationService.getToken(uuid)) {
+            return if (this != null) TokenDto(this.jwt) else TokenDto()
+        }
     }
 
     @PostMapping("/api/tokengroup")
@@ -46,7 +43,7 @@ class ApiController {
     @GetMapping("/api/tokengroup")
     fun getAllTokenGroups() : List<TokenGroupDto>
     {
-        return tokenGenerationService.findAllTokenGroup()
+        return tokenGenerationService.findAllTokenGroup().map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
 
     @PostMapping("/api/register")

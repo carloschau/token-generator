@@ -1,4 +1,4 @@
-package carloschau.tokengenerator.dto.model.user
+package carloschau.tokengenerator.response.model.user
 
 enum class LoginStatus(val value: Int){
     SUCCESS(0),
