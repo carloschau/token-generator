@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
+@RequestMapping("/api")
 class ApiController {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -27,32 +28,32 @@ class ApiController {
     @Autowired
     private lateinit var authenticationService : AuthenticationService
 
-    @GetMapping("/api/token/{uuid}")
+    @GetMapping("/token/{uuid}")
     fun token(@PathVariable uuid: String): TokenDto {
         with (tokenGenerationService.getToken(uuid)) {
             return if (this != null) TokenDto(this.jwt) else TokenDto()
         }
     }
 
-    @PostMapping("/api/tokengroup")
+    @PostMapping("/tokengroup")
     fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroupRequest)
     {
         tokenGenerationService.createTokenGroup(request.name)
     }
 
-    @GetMapping("/api/tokengroup")
+    @GetMapping("/tokengroup")
     fun getAllTokenGroups() : List<TokenGroupDto>
     {
         return tokenGenerationService.findAllTokenGroup().map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
 
-    @PostMapping("/api/register")
+    @PostMapping("/register")
     fun createUser(@RequestBody @Valid request: CreateUserRequest)
     {
         userService.createUser(request.username, request.email, request.password)
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     fun login(@RequestBody @Valid request : LoginRequest, @RequestHeader("user-agent") userAgent : String) : LoginDto
     {
         val user = userService.authenticate(request.email, request.password)
