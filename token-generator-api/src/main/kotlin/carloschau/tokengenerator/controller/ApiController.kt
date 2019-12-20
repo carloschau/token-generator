@@ -53,7 +53,7 @@ class ApiController {
     }
 
     @PostMapping("/api/login")
-    fun login(@RequestBody @Valid request : LoginRequest) : LoginDto
+    fun login(@RequestBody @Valid request : LoginRequest, @RequestHeader("user-agent") userAgent : String) : LoginDto
     {
         val user = userService.authenticate(request.email, request.password)
         val loginStatus =
@@ -67,8 +67,9 @@ class ApiController {
         if (loginStatus == SUCCESS && user != null)
         {
             return user.run {
-                var jwt = authenticationService.IssueAuthenticationToken(this, "")
-                return LoginDto(loginStatus, jwt)
+                var authenticationToken = authenticationService.IssueAuthenticationToken(this, userAgent)
+                userService.addAccessTokenToUser(this, authenticationToken.accessToken)
+                return LoginDto(loginStatus, authenticationToken.token)
             }
         }
         else

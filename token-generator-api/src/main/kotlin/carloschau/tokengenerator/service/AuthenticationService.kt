@@ -20,7 +20,7 @@ class AuthenticationService {
     @Value("\${authentication.token.expirationTime}")
     lateinit var TOKEN_EXPIRE_SECONDS : String
 
-    fun IssueAuthenticationToken(user : User, userAgent : String) : String
+    fun IssueAuthenticationToken(user : User, userAgent : String) : AuthenticationToken
     {
         val expiration = Date(System.currentTimeMillis() + TOKEN_EXPIRE_SECONDS.toInt() * 1000)
         val accessToken = UUID.randomUUID().toString()
@@ -31,7 +31,7 @@ class AuthenticationService {
         //Log the token
         authenticationTokenRepository.insert(authenticationToken.toDao)
         logger.debug("Authentication token created, ${0} for user ${1}", authenticationToken.accessToken, authenticationToken.userId)
-        return jwt
+        return authenticationToken
     }
 
     //Verify token

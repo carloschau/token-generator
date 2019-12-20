@@ -19,12 +19,15 @@ class User (
         var status : UserStatus,
         var createdOn : Date){
 
+    val accessTokens = listOf<String>()
+
     val toDao get() = UserDao(
             Id,
             username,
             email,
             passwordHash,
             status.name,
+            accessTokens,
             createdOn
     )
 
@@ -51,4 +54,5 @@ data class UserDao(@Id val Id: String?,
                    @Indexed(unique = true) val email : String,
                    val passwordHash: String,
                    val status: String,
+                   val accessTokens : List<String> = listOf(),
                    val createdOn : Date)

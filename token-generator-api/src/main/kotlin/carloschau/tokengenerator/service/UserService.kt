@@ -35,11 +35,16 @@ class  UserService{
     }
 
     fun authenticate(email : String, password : String) : User? {
-        val user = User.fromDao(userRepository.findByEmail(email))
+        val userDao = userRepository.findByEmail(email)
+        val user = User.fromDao(userDao)
 
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
 
         return if (user != null && argon2.verify(user.passwordHash, password)) user else null
+    }
+
+    fun addAccessTokenToUser(user: User, accessToken : String) {
+        userRepository.pushAuthenticationAccessToken(user.Id!!, accessToken)
     }
 
 }
