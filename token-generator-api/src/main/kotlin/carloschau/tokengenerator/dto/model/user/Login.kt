@@ -7,4 +7,4 @@ enum class LoginStatus(val value: Int){
     ACCOUNT_LOCKED(3)
 }
 
-data class LoginDto(val status : LoginStatus)
+data class LoginDto(val status : LoginStatus, val authenticationToken : String)
