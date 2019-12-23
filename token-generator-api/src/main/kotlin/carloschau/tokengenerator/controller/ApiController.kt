@@ -68,7 +68,7 @@ class ApiController {
         if (loginStatus == SUCCESS && user != null)
         {
             return user.run {
-                var authenticationToken = authenticationService.IssueAuthenticationToken(this, userAgent)
+                var authenticationToken = authenticationService.issueAuthenticationToken(this, userAgent)
                 userService.addAccessTokenToUser(this, authenticationToken.accessToken)
                 return LoginDto(loginStatus, authenticationToken.token)
             }
