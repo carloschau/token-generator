@@ -1,0 +1,7 @@
+package carloschau.tokengenerator.security
+
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService
+
+class PreAuthenticatedUserDetailsService : PreAuthenticatedGrantedAuthoritiesUserDetailsService() {
+
+}

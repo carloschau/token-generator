@@ -25,9 +25,6 @@ class ApiController {
     @Autowired
     private lateinit var userService : UserService
 
-    @Autowired
-    private lateinit var authenticationService : AuthenticationService
-
     @GetMapping("/token/{uuid}")
     fun token(@PathVariable uuid: String): TokenDto {
         with (tokenGenerationService.getToken(uuid)) {
@@ -53,27 +50,9 @@ class ApiController {
         userService.createUser(request.username, request.email, request.password)
     }
 
-    @PostMapping("/login")
-    fun login(@RequestBody @Valid request : LoginRequest, @RequestHeader("user-agent") userAgent : String) : LoginDto
-    {
-        val user = userService.authenticate(request.email, request.password)
-        val loginStatus =
-                when {
-                    user == null -> EMAIL_OR_PASSWORD_ERROR
-                    user.status == UserStatus.INACTIVE -> INACTIVE
-                    user.status == UserStatus.LOCKED -> ACCOUNT_LOCKED
-                    else -> SUCCESS
-                }
 
-        if (loginStatus == SUCCESS && user != null)
-        {
-            return user.run {
-                var authenticationToken = authenticationService.issueAuthenticationToken(this, userAgent)
-                userService.addAccessTokenToUser(this, authenticationToken.accessToken)
-                return LoginDto(loginStatus, authenticationToken.token)
-            }
-        }
-        else
-            throw AuthenticationErrorException(loginStatus.toString())
+    @RequestMapping("/hello")
+    fun hello(){
+
     }
 }
