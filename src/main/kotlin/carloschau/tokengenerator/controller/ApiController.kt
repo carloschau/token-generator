@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/api")
 class ApiController {
     val logger = LoggerFactory.getLogger(javaClass)
 
@@ -44,11 +43,7 @@ class ApiController {
         return tokenGenerationService.findAllTokenGroup().map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
 
-    @PostMapping("/register")
-    fun createUser(@RequestBody @Valid request: CreateUserRequest)
-    {
-        userService.createUser(request.username, request.email, request.password)
-    }
+
 
 
     @RequestMapping("/hello")

@@ -21,7 +21,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             http.csrf().disable()
             //http.authorizeRequests().antMatchers("/api/hello").authenticated()
 
-            http.antMatcher("/login")
+            http.antMatcher("/api/auth/**")
                     .anonymous()
 
             http.antMatcher("/api/**")
@@ -45,19 +45,22 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     fun getPreAuthenticatedAuthenticationProvider(): PreAuthenticatedAuthenticationProvider{
         return PreAuthenticatedAuthenticationProvider().apply {
             setPreAuthenticatedUserDetailsService(getPreAuthenticatedUserDetailsService())
-
         }
     }
 
     @Bean
     fun getPreAuthenticatedUserDetailsService(): PreAuthenticatedGrantedAuthoritiesUserDetailsService {
-        return PreAuthenticatedGrantedAuthoritiesUserDetailsService()
+        return PreAuthenticatedGrantedAuthoritiesUserDetailsService().apply {
+
+        }
     }
 
     @Bean
     fun getTokenAuthenticationFilter(): TokenAuthenticationFilter {
         return TokenAuthenticationFilter().apply {
             setAuthenticationManager(authenticationManager())
+
+
         }
     }
 }
