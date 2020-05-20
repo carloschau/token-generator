@@ -53,7 +53,7 @@ class TokenGroup (
 
 }
 
-@Document(collection = "tokenGroups")
+@Document(collection = "tokenGroup")
 data class TokenGroupDao(
         @Id
         var Id: String? = null,

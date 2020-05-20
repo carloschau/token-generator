@@ -48,7 +48,7 @@ class User (
 
 }
 
-@Document("users")
+@Document("user")
 data class UserDao(@Id val Id: String?,
                    @Indexed(unique = true) val username: String,
                    @Indexed(unique = true) val email : String,

@@ -2,7 +2,7 @@ package carloschau.tokengenerator.service
 
 import carloschau.tokengenerator.model.user.User
 import carloschau.tokengenerator.model.user.UserStatus
-import carloschau.tokengenerator.repository.user.UsersRepository
+import carloschau.tokengenerator.repository.user.UserRepository
 import de.mkammerer.argon2.Argon2Factory
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,7 +15,7 @@ class  UserService{
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
-    private lateinit var userRepository: UsersRepository
+    private lateinit var userRepository: UserRepository
 
     fun createUser(username : String, email : String, password : String){
 

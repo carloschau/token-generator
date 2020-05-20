@@ -2,7 +2,6 @@ package carloschau.tokengenerator.repository.user
 
 import carloschau.tokengenerator.model.user.UserDao
 import org.bson.types.ObjectId
-import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
@@ -11,14 +10,14 @@ import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Repository
 
 
-interface UsersRepository{
+interface UserRepository{
     fun findByEmail(email : String) : UserDao?
     fun pushAuthenticationAccessToken(userId : String, accessToken : String)
     fun save(user: UserDao)
 }
 
 @Repository
-class UsersRepositoryImp : UsersRepository{
+class UserRepositoryImp : UserRepository{
     @Autowired
     lateinit var mongoTemplate : MongoTemplate
 

@@ -36,7 +36,7 @@ class AuthenticationToken(val token : String, val userId : String, val issueAt: 
     }
 }
 
-@Document(collection = "authenticationTokens")
+@Document(collection = "authenticationToken")
 data class AuthenticationTokenDao(
         @Id
         var Id:String? = null,
