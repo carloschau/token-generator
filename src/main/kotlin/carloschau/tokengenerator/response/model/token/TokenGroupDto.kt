@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.response.model.token
 
-import carloschau.tokengenerator.model.token.TokenGroup
+import carloschau.tokengenerator.model.dao.token.TokenGroup
+import io.jsonwebtoken.security.Keys
 import java.util.*
 
 data class TokenGroupDto (val Id: String? = null,
@@ -22,6 +23,6 @@ data class TokenGroupDto (val Id: String? = null,
             tokenGroup.effectiveDate,
             tokenGroup.expiryDate,
             tokenGroup.uuid?.toString(),
-            tokenGroup.signingKey?.encoded.let { Base64.getEncoder().encodeToString(it) }
+            tokenGroup.signingKey?.data?.let {  Keys.hmacShaKeyFor(it) }?.encoded.let { Base64.getEncoder().encodeToString(it) }
     )
 }

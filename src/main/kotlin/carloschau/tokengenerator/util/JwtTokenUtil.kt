@@ -1,6 +1,6 @@
 package carloschau.tokengenerator.util
 
-import carloschau.tokengenerator.model.user.User
+import carloschau.tokengenerator.model.dao.user.User
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts

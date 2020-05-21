@@ -2,11 +2,6 @@ package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.response.model.token.TokenDto
 import carloschau.tokengenerator.response.model.token.TokenGroupDto
-import carloschau.tokengenerator.response.model.user.LoginDto
-import carloschau.tokengenerator.response.model.user.LoginStatus.*
-import carloschau.tokengenerator.exception.AuthenticationErrorException
-import carloschau.tokengenerator.model.user.UserStatus
-import carloschau.tokengenerator.service.AuthenticationService
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory

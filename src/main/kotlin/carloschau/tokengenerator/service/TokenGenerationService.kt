@@ -1,9 +1,7 @@
 package carloschau.tokengenerator.service
 
-import carloschau.tokengenerator.response.model.token.TokenDto
-import carloschau.tokengenerator.response.model.token.TokenGroupDto
+import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.token.Token
-import carloschau.tokengenerator.model.token.TokenGroup
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
 import carloschau.tokengenerator.util.UuidUtil
@@ -29,7 +27,7 @@ class TokenGenerationService{
 
     fun getToken(uuidStr: String): Token? {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
-        val tokenGroup = TokenGroup.fromDao(tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid))))
+        val tokenGroup = tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid)))
         logger?.info(tokenGroup?.Id?:"Not Found")
 
         return tokenGroup?.run group@ {

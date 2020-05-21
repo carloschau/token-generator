@@ -1,43 +1,17 @@
 package carloschau.tokengenerator.repository.user
 
-import carloschau.tokengenerator.model.user.UserDao
+import carloschau.tokengenerator.model.dao.user.User
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
+import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
-
-interface UserRepository{
-    fun findById(id: String) : UserDao?
-    fun findByEmail(email : String) : UserDao?
-    fun pushAuthenticationAccessToken(userId : String, accessToken : String)
-    fun save(user: UserDao)
-}
-
 @Repository
-class UserRepositoryImp : UserRepository{
-    @Autowired
-    lateinit var mongoTemplate : MongoTemplate
-
-    override fun findById(id: String): UserDao? {
-        return mongoTemplate.findById(id, UserDao::class.java)
-    }
-
-    override fun findByEmail(email: String): UserDao? {
-        return mongoTemplate.findOne(Query.query(Criteria.where("email").`is`(email)), UserDao::class.java)
-    }
-
-    override fun pushAuthenticationAccessToken(userId : String, accessToken : String){
-        mongoTemplate.updateFirst(
-                Query.query(Criteria.where("_id").`is`(ObjectId(userId))),
-                Update().push("accessTokens", accessToken), UserDao::class.java)
-    }
-
-    override fun save(user: UserDao) {
-        mongoTemplate.save(user)
-    }
+interface UserRepository : MongoRepository<User, String> {
+    fun findByEmail(email : String) : User?
+    fun findByUsername(username : String) : User?
 }
-

@@ -1,8 +1,8 @@
 package carloschau.tokengenerator.repository.token
 
-import carloschau.tokengenerator.model.authentication.AuthenticationTokenDao
+import carloschau.tokengenerator.model.dao.authentication.AuthenticationToken
 import org.springframework.data.mongodb.repository.MongoRepository
 
-interface AuthenticationTokenRepository : MongoRepository<AuthenticationTokenDao, String>{
-    fun findByAccessToken(accessToken : String) : AuthenticationTokenDao?
+interface AuthenticationTokenRepository : MongoRepository<AuthenticationToken, String>{
+    fun findByAccessToken(accessToken : String) : AuthenticationToken?
 }

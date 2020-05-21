@@ -1,10 +1,11 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.model.user.UserStatus
+import carloschau.tokengenerator.model.dao.user.UserStatus
 import carloschau.tokengenerator.response.model.user.LoginDto
 import carloschau.tokengenerator.response.model.user.LoginStatus
 import carloschau.tokengenerator.service.AuthenticationService
 import carloschau.tokengenerator.service.UserService
+import carloschau.tokengenerator.util.JwtTokenUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,6 +21,9 @@ class UserAuthenticationController {
 
     @Autowired
     private lateinit var authenticationService : AuthenticationService
+
+    @Autowired
+    private  lateinit var jwtTokenUtil : JwtTokenUtil
 
     @PostMapping("/login")
     fun login(@RequestBody @Valid request : LoginRequest, @RequestHeader("user-agent") userAgent : String) : ResponseEntity<LoginDto>
@@ -37,8 +41,7 @@ class UserAuthenticationController {
             val tokenString = when (loginStatus){
                 LoginStatus.SUCCESS -> {
                     val authenticationToken = authenticationService.issueAuthenticationToken(it, userAgent)
-                    userService.addAccessTokenToUser(it, authenticationToken.accessToken)
-                    authenticationToken.token
+                    jwtTokenUtil.getJwt(user, authenticationToken.expiration, authenticationToken.accessToken)
                 }
                 else -> null
             }
