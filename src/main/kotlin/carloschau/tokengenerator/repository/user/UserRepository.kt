@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository
 
 
 interface UserRepository{
+    fun findById(id: String) : UserDao?
     fun findByEmail(email : String) : UserDao?
     fun pushAuthenticationAccessToken(userId : String, accessToken : String)
     fun save(user: UserDao)
@@ -20,6 +21,10 @@ interface UserRepository{
 class UserRepositoryImp : UserRepository{
     @Autowired
     lateinit var mongoTemplate : MongoTemplate
+
+    override fun findById(id: String): UserDao? {
+        return mongoTemplate.findById(id, UserDao::class.java)
+    }
 
     override fun findByEmail(email: String): UserDao? {
         return mongoTemplate.findOne(Query.query(Criteria.where("email").`is`(email)), UserDao::class.java)

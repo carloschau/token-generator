@@ -2,7 +2,10 @@ package carloschau.tokengenerator.service
 
 import carloschau.tokengenerator.model.authentication.AuthenticationToken
 import carloschau.tokengenerator.model.user.User
+import carloschau.tokengenerator.model.user.UserDao
+import carloschau.tokengenerator.model.user.UserStatus
 import carloschau.tokengenerator.repository.token.AuthenticationTokenRepository
+import carloschau.tokengenerator.repository.user.UserRepository
 import carloschau.tokengenerator.util.JwtTokenUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,6 +17,8 @@ import java.util.*
 class AuthenticationService {
     @Autowired
     private lateinit var authenticationTokenRepository: AuthenticationTokenRepository
+    @Autowired
+    private lateinit var userRepository: UserRepository
 
     @Autowired
     private  lateinit var jwtTokenUtil : JwtTokenUtil
@@ -38,6 +43,19 @@ class AuthenticationService {
     }
 
     //Verify token
+    fun getUserByAccessToken(accessToken: String): UserDao?
+    {
+        val authenticationToken = authenticationTokenRepository.findByAccessToken(accessToken)
+        return authenticationToken?.let {
+            val user = userRepository.findById(authenticationToken.userId)
+            user?.let {
+                if (user.status == UserStatus.ACTIVE.name)
+                    user
+                else
+                    null
+            }
+        }
+    }
 
     //Revoke token
 }

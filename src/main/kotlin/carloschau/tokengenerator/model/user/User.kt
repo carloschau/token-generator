@@ -55,4 +55,5 @@ data class UserDao(@Id val Id: String?,
                    val passwordHash: String,
                    val status: String,
                    val accessTokens : List<String> = listOf(),
-                   val createdOn : Date)
+                   val createdOn : Date,
+                    val roles : List<String> = listOf())

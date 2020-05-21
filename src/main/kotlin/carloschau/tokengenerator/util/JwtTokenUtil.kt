@@ -19,11 +19,11 @@ import java.util.*
 @Component
 class JwtTokenUtil{
     @Value("\${authentication.key.filename}")
-    lateinit var authKeyFilename : String
-
-    val publicKeyFilename : String = "authkey_pub_uat.pem"
+    private lateinit var authKeyFilename : String
+    private val publicKeyFilename : String = "authkey_pub_uat.pem"
 
     private val logger = LoggerFactory.getLogger(javaClass)
+    //TODO: generalize function parameter
     fun getJwt(user: User, expirationDate : Date, accessToken : String) : String
     {
         //TODO: Use JWE when jsonwebtoken support it

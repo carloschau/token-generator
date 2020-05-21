@@ -1,45 +1,41 @@
 package carloschau.tokengenerator.configuration
 
-import carloschau.tokengenerator.security.PreAuthenticatedUserDetailsService
+import carloschau.tokengenerator.security.PreAuthenticationDetailsSource
 import carloschau.tokengenerator.security.TokenAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
+
     override fun configure(http: HttpSecurity?) {
         http?.let {
             http.csrf().disable()
-            //http.authorizeRequests().antMatchers("/api/hello").authenticated()
+            http.sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
-            http.antMatcher("/api/auth/**")
-                    .anonymous()
+            http.formLogin().disable()
+            http.logout().disable()
 
-            http.antMatcher("/api/**")
-                    .addFilterAfter(getTokenAuthenticationFilter(), BasicAuthenticationFilter::class.java)
+            http.addFilterAfter(getTokenAuthenticationFilter(), RequestHeaderAuthenticationFilter::class.java)
                     .authenticationProvider(getPreAuthenticatedAuthenticationProvider())
                     .authorizeRequests()
-                    .anyRequest()
+                    .antMatchers("/auth/**")
+                    .permitAll()
+                    .antMatchers("/**")
                     .authenticated()
-
 
         }
     }
-
-//    override fun configure(auth: AuthenticationManagerBuilder?) {
-//        auth?.let {
-//            auth.authenticationProvider(getPreAuthenticatedAuthenticationProvider())
-//        }
-//    }
 
     @Bean
     fun getPreAuthenticatedAuthenticationProvider(): PreAuthenticatedAuthenticationProvider{
@@ -59,8 +55,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     fun getTokenAuthenticationFilter(): TokenAuthenticationFilter {
         return TokenAuthenticationFilter().apply {
             setAuthenticationManager(authenticationManager())
-
-
+            setAuthenticationDetailsSource(PreAuthenticationDetailsSource())
         }
     }
 }
