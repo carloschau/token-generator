@@ -31,10 +31,9 @@ class UserAuthenticationController {
         val user = userService.authenticate(request.email, request.password)
         return user?.let {
             val loginStatus =
-                    when {
-                        user == null -> LoginStatus.EMAIL_OR_PASSWORD_ERROR
-                        user.status == UserStatus.INACTIVE -> LoginStatus.INACTIVE
-                        user.status == UserStatus.LOCKED -> LoginStatus.ACCOUNT_LOCKED
+                    when (user.status) {
+                        UserStatus.INACTIVE -> LoginStatus.INACTIVE
+                        UserStatus.LOCKED -> LoginStatus.ACCOUNT_LOCKED
                         else -> LoginStatus.SUCCESS
                     }
 
