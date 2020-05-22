@@ -23,6 +23,6 @@ data class TokenGroupDto (val Id: String? = null,
             tokenGroup.effectiveDate,
             tokenGroup.expiryDate,
             tokenGroup.uuid?.toString(),
-            tokenGroup.signingKey?.data?.let {  Keys.hmacShaKeyFor(it) }?.encoded.let { Base64.getEncoder().encodeToString(it) }
+            tokenGroup.signingKey?.encoded.let { Base64.getEncoder().encodeToString(it) }
     )
 }

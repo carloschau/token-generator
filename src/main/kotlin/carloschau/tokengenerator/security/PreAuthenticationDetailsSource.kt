@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.AuthenticationDetailsSource
 import org.springframework.security.core.authority.GrantedAuthoritiesContainer
+import org.springframework.stereotype.Component
 import javax.naming.AuthenticationException
 import javax.servlet.http.HttpServletRequest
 
+@Component
 class PreAuthenticationDetailsSource : AuthenticationDetailsSource<HttpServletRequest, GrantedAuthoritiesContainer> {
 
     @Autowired

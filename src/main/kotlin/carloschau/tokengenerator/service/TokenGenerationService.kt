@@ -59,10 +59,10 @@ class TokenGenerationService{
         }
 
         logger?.info("Token group uuid created: ${ tokenGroup.uuid }")
-        tokenGroupRepository.save(tokenGroup.toDao)
+        tokenGroupRepository.save(tokenGroup)
     }
 
     fun findAllTokenGroup() : List<TokenGroup>{
-        return tokenGroupRepository.findAll().filterNotNull().map { TokenGroup.fromDao(it)!! }
+        return tokenGroupRepository.findAll().filterNotNull()
     }
 }

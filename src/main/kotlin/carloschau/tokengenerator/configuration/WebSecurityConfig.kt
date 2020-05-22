@@ -55,8 +55,13 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
     fun getTokenAuthenticationFilter(): TokenAuthenticationFilter {
         return TokenAuthenticationFilter().apply {
             setAuthenticationManager(authenticationManager())
-            setAuthenticationDetailsSource(PreAuthenticationDetailsSource())
+            setAuthenticationDetailsSource(getPreAuthenticationDetailsSource())
         }
+    }
+
+    @Bean
+    fun getPreAuthenticationDetailsSource(): PreAuthenticationDetailsSource{
+        return PreAuthenticationDetailsSource()
     }
 }
 
