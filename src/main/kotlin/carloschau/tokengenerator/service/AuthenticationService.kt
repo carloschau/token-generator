@@ -5,7 +5,6 @@ import carloschau.tokengenerator.model.dao.user.User
 import carloschau.tokengenerator.model.dao.user.UserStatus
 import carloschau.tokengenerator.repository.token.AuthenticationTokenRepository
 import carloschau.tokengenerator.repository.user.UserRepository
-import carloschau.tokengenerator.util.JwtTokenUtil
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -31,7 +30,7 @@ class AuthenticationService {
         val accessToken = UUID.randomUUID().toString()
 
         val authenticationToken = AuthenticationToken(
-                userId = user.Id ?: "",
+                userId = user.id!!,
                 issueAt = Date(),
                 expiration = expiration,
                 accessToken = accessToken,
@@ -48,7 +47,7 @@ class AuthenticationService {
     {
         val authenticationToken = authenticationTokenRepository.findByAccessToken(accessToken)
         return authenticationToken?.let {
-            userRepository.findById(authenticationToken.userId).orElse(null)?.let {user ->
+            userRepository.findById(authenticationToken.userId).orElse(null)?.let { user ->
                 if (user.status == UserStatus.ACTIVE)
                     user
                 else

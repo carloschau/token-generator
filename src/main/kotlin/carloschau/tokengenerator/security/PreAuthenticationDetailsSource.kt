@@ -12,14 +12,13 @@ import javax.servlet.http.HttpServletRequest
 
 @Component
 class PreAuthenticationDetailsSource : AuthenticationDetailsSource<HttpServletRequest, GrantedAuthoritiesContainer> {
-
     @Autowired
     lateinit var authenticationService: AuthenticationService
 
     @Autowired
     lateinit var jwtTokenUtil: JwtTokenUtil
 
-    override fun buildDetails(context: HttpServletRequest?): GrantedAuthoritiesContainer {
+    override fun buildDetails(context: HttpServletRequest?): GrantedAuthoritiesContainer? {
         return context?.let {
             val headerVal = context.getHeader(authenticationHeader)
             val jwtStr = if (headerVal.startsWith(BEARER, true))
@@ -35,7 +34,7 @@ class PreAuthenticationDetailsSource : AuthenticationDetailsSource<HttpServletRe
                 PreAuthenticationDetails(user)
             }
 
-        } ?: throw AuthenticationException("HttpServletRequest is null")
+        }
     }
 
     companion object {

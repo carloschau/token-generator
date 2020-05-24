@@ -1,7 +1,6 @@
 package carloschau.tokengenerator.response.model.token
 
 import carloschau.tokengenerator.model.dao.token.TokenGroup
-import io.jsonwebtoken.security.Keys
 import java.util.*
 
 data class TokenGroupDto (val Id: String? = null,
@@ -15,7 +14,7 @@ data class TokenGroupDto (val Id: String? = null,
                           val signingKey : String? = null)
 {
     constructor(tokenGroup : TokenGroup) : this(
-            tokenGroup.Id,
+            tokenGroup.id,
             tokenGroup.name,
             tokenGroup.owner_Id,
             tokenGroup.numberOfTokenIssued,

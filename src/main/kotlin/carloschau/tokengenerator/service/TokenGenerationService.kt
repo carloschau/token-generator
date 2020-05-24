@@ -28,7 +28,7 @@ class TokenGenerationService{
     fun getToken(uuidStr: String): Token? {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
         val tokenGroup = tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid)))
-        logger?.info(tokenGroup?.Id?:"Not Found")
+        logger?.debug("Token Group with uuid {} is {}".format(uuid,  tokenGroup?.id?:"Not Found"))
 
         return tokenGroup?.run group@ {
             val jwtString = Jwts.builder()
@@ -40,7 +40,7 @@ class TokenGenerationService{
 
             val token = Token().apply {
                 this.jwt = jwtString
-                this.tokenGroup_Id = this@group.Id
+                this.tokenGroup_Id = this@group.id
             }
 
             tokenRepository.save(token)
@@ -58,7 +58,7 @@ class TokenGenerationService{
             this.owner_Id = ownerId
         }
 
-        logger?.info("Token group uuid created: ${ tokenGroup.uuid }")
+        logger?.debug("Token group uuid created: ${ tokenGroup.uuid }")
         tokenGroupRepository.save(tokenGroup)
     }
 

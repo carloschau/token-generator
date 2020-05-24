@@ -13,7 +13,7 @@ import javax.crypto.SecretKey
 @Document
 class TokenGroup(
         @Id
-        var Id: String? = null,
+        var id: String? = null,
         var name: String = "",
         var owner_Id: String? = null,
         var numberOfTokenIssued: Int = 0,

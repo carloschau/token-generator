@@ -13,7 +13,7 @@ enum class UserStatus{
 
 @Document("user")
 data class User(
-        @Id val Id: String? = null,
+        @Id val id: String? = null,
         @Indexed(unique = true) val username: String,
         @Indexed(unique = true) val email : String,
         val passwordHash: String,

@@ -7,7 +7,7 @@ import java.util.*
 @Document
 data class AuthenticationToken(
         @Id
-        var Id:String? = null,
+        var id:String? = null,
         var userId : String,
         var issueAt : Date,
         var expiration : Date,
