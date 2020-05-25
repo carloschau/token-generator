@@ -4,6 +4,7 @@ import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.token.Token
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
+import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -12,6 +13,7 @@ import org.bson.types.Binary
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -49,13 +51,13 @@ class TokenGenerationService{
     }
 
     fun createTokenGroup(name : String){
-        val ownerId = "5d5010cf2b7a9e3de0b4ff47" //TODO: Get userId of current user
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
 
         val tokenGroup = TokenGroup().apply {
             this.name = name
             this.uuid = UUID.randomUUID()
             this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-            this.owner_Id = ownerId
+            this.ownerId = authenticationDetails.userId
         }
 
         logger?.debug("Token group uuid created: ${ tokenGroup.uuid }")

@@ -31,7 +31,7 @@ class PreAuthenticationDetailsSource : AuthenticationDetailsSource<HttpServletRe
             val accessToken = jws.body.id
             val user = authenticationService.getUserByAccessToken(accessToken)
             user?.let {
-                PreAuthenticationDetails(user)
+                AuthenticationDetails(user)
             }
 
         }

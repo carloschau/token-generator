@@ -6,6 +6,7 @@ import carloschau.tokengenerator.response.model.user.LoginStatus
 import carloschau.tokengenerator.service.AuthenticationService
 import carloschau.tokengenerator.service.UserService
 import carloschau.tokengenerator.util.JwtTokenUtil
+import io.jsonwebtoken.Claims
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -40,7 +41,13 @@ class UserAuthenticationController {
             val tokenString = when (loginStatus){
                 LoginStatus.SUCCESS -> {
                     val authenticationToken = authenticationService.issueAuthenticationToken(it, userAgent)
-                    jwtTokenUtil.getJwt(user, authenticationToken.expiration, authenticationToken.accessToken)
+                    val claims = mapOf<String, Any>(
+                            Claims.SUBJECT to user.username,
+                            Claims.ID to authenticationToken.accessToken,
+                            Claims.EXPIRATION to authenticationToken.expiration,
+                            Claims.ISSUED_AT to authenticationToken.expiration
+                    )
+                    jwtTokenUtil.getJwt(claims)
                 }
                 else -> null
             }

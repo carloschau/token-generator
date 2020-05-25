@@ -15,7 +15,7 @@ class TokenGroup(
         @Id
         var id: String? = null,
         var name: String = "",
-        var owner_Id: String? = null,
+        var ownerId: String? = null,
         var numberOfTokenIssued: Int = 0,
         var maxTokenIssuance: Int = 0,
         var effectiveDate: Date? = null,

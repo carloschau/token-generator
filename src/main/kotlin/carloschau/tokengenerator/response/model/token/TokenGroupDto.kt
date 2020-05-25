@@ -16,7 +16,7 @@ data class TokenGroupDto (val Id: String? = null,
     constructor(tokenGroup : TokenGroup) : this(
             tokenGroup.id,
             tokenGroup.name,
-            tokenGroup.owner_Id,
+            tokenGroup.ownerId,
             tokenGroup.numberOfTokenIssued,
             tokenGroup.maxTokenIssuance,
             tokenGroup.effectiveDate,
