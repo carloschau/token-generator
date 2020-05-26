@@ -11,20 +11,19 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Document
-class TokenGroup(
-        @Id
-        var id: String? = null,
-        var name: String = "",
-        var ownerId: String? = null,
-        var numberOfTokenIssued: Int = 0,
-        var maxTokenIssuance: Int = 0,
-        var effectiveDate: Date? = null,
-        var expiryDate : Date? = null,
-        uuid: UUID? = null,
-        signingKey : SecretKey? = null)
+class TokenGroup()
 {
+
+    @Id
+    var id: String? = null
+    var name: String = ""
+    var ownerId: String? = null
+    var numberOfTokenIssued: Int = 0
+    var maxTokenIssuance: Int = 0
+    var effectiveDate: Date? = null
+    var expiryDate : Date? = null
     @Transient
-    var uuid: UUID? = uuid
+    var uuid: UUID? = null
     set(value) {
         uuidBinary = value?.let { UuidUtil.toBytes(it) }?.let { Binary(it) }
         field = value
@@ -35,7 +34,7 @@ class TokenGroup(
     }
 
     @Transient
-    var signingKey: SecretKey? = signingKey
+    var signingKey: SecretKey? = null
     set(value) {
         signingKeyBinary = Binary(value?.encoded)
         field = value

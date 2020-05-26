@@ -1,8 +1,10 @@
 package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.model.dao.user.UserStatus
-import carloschau.tokengenerator.response.model.user.LoginDto
-import carloschau.tokengenerator.response.model.user.LoginStatus
+import carloschau.tokengenerator.model.dto.request.user.CreateUser
+import carloschau.tokengenerator.model.dto.request.user. Login
+import carloschau.tokengenerator.model.dto.response.user.LoginDto
+import carloschau.tokengenerator.model.dto.response.user.LoginStatus
 import carloschau.tokengenerator.service.AuthenticationService
 import carloschau.tokengenerator.service.UserService
 import carloschau.tokengenerator.util.JwtTokenUtil
@@ -27,7 +29,7 @@ class UserAuthenticationController {
     private  lateinit var jwtTokenUtil : JwtTokenUtil
 
     @PostMapping("/login")
-    fun login(@RequestBody @Valid request : LoginRequest, @RequestHeader("user-agent") userAgent : String) : ResponseEntity<LoginDto>
+    fun login(@RequestBody @Valid request : Login, @RequestHeader("user-agent") userAgent : String) : ResponseEntity<LoginDto>
     {
         val user = userService.authenticate(request.email, request.password)
         return user?.let {
@@ -57,7 +59,7 @@ class UserAuthenticationController {
     }
 
     @PostMapping("/register")
-    fun createUser(@RequestBody @Valid request: CreateUserRequest)
+    fun createUser(@RequestBody @Valid request: CreateUser)
     {
         userService.createUser(request.username, request.email, request.password)
     }

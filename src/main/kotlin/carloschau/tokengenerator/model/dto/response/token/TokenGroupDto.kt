@@ -1,4 +1,4 @@
-package carloschau.tokengenerator.response.model.token
+package carloschau.tokengenerator.model.dto.response.token
 
 import carloschau.tokengenerator.model.dao.token.TokenGroup
 import java.util.*

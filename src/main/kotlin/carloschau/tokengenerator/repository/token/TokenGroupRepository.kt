@@ -7,4 +7,5 @@ import org.springframework.data.mongodb.repository.MongoRepository
 interface TokenGroupRepository : MongoRepository<TokenGroup, String> {
 
     fun findByUuid(uuid: Binary) : TokenGroup?
+    fun findByOwnerId(ownerId: String): List<TokenGroup>
 }

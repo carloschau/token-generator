@@ -1,11 +1,14 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.response.model.token.TokenDto
-import carloschau.tokengenerator.response.model.token.TokenGroupDto
+import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
+import carloschau.tokengenerator.model.dto.response.token.TokenDto
+import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
+import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -27,19 +30,19 @@ class ApiController {
     }
 
     @PostMapping("/tokengroup")
-    fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroupRequest)
+    fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroup)
     {
-        tokenGenerationService.createTokenGroup(request.name)
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
+        tokenGenerationService.createTokenGroup(request, authenticationDetails.userId)
     }
 
     @GetMapping("/tokengroup")
     fun getAllTokenGroups() : List<TokenGroupDto>
     {
-        return tokenGenerationService.findAllTokenGroup().map { tokenGroup -> TokenGroupDto(tokenGroup) }
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
+        return tokenGenerationService.findTokenGroupsByOwner(authenticationDetails.userId)
+                .map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
-
-
-
 
     @RequestMapping("/hello")
     fun hello(){

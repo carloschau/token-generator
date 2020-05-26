@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.service
 
 import carloschau.tokengenerator.model.dao.token.TokenGroup
+import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.token.Token
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
@@ -50,18 +51,24 @@ class TokenGenerationService{
         }
     }
 
-    fun createTokenGroup(name : String){
-        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-
+    fun createTokenGroup(createTokenGroup : CreateTokenGroup, userId: String): String{
         val tokenGroup = TokenGroup().apply {
-            this.name = name
+            this.name = createTokenGroup.name
             this.uuid = UUID.randomUUID()
             this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-            this.ownerId = authenticationDetails.userId
+            this.ownerId = userId
+            this.effectiveDate = createTokenGroup.effectiveDate
+            this.expiryDate = createTokenGroup.expiryDate
+            this.maxTokenIssuance = createTokenGroup.maxTokenIssuance
         }
 
         logger?.debug("Token group uuid created: ${ tokenGroup.uuid }")
         tokenGroupRepository.save(tokenGroup)
+        return tokenGroup.uuid.toString()
+    }
+
+    fun findTokenGroupsByOwner(userId: String) : List<TokenGroup>{
+        return tokenGroupRepository.findByOwnerId(userId)
     }
 
     fun findAllTokenGroup() : List<TokenGroup>{
