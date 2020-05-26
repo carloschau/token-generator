@@ -11,9 +11,8 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Document
-class TokenGroup()
+class TokenGroup
 {
-
     @Id
     var id: String? = null
     var name: String = ""

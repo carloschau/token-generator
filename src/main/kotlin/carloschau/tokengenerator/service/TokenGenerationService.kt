@@ -2,10 +2,10 @@ package carloschau.tokengenerator.service
 
 import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
-import carloschau.tokengenerator.model.token.Token
+import carloschau.tokengenerator.model.dao.token.Token
+import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
-import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -14,7 +14,6 @@ import org.bson.types.Binary
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -28,25 +27,19 @@ class TokenGenerationService{
     @Autowired
     private lateinit var tokenRepository: TokenRepository
 
-    fun getToken(uuidStr: String): Token? {
+    fun getToken(uuidStr: String, type: TokenType, media: String?): Token? {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
         val tokenGroup = tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid)))
         logger?.debug("Token Group with uuid {} is {}".format(uuid,  tokenGroup?.id?:"Not Found"))
 
-        return tokenGroup?.run group@ {
-            val jwtString = Jwts.builder()
-                    .setHeaderParam("typ", "JWT")
-                    .setHeaderParam("alg", "HS256")
-                    .setIssuedAt(Date())
-                    .signWith(this@group.signingKey)
-                    .compact()
-
+        return tokenGroup?.let { group ->
             val token = Token().apply {
-                this.jwt = jwtString
-                this.tokenGroup_Id = this@group.id
+                this.uuid = UUID.randomUUID()
+                this.media = media
+                this.groupId = tokenGroup.id
+                this.type = type
+                this.issueAt = Date()
             }
-
-            tokenRepository.save(token)
             token
         }
     }

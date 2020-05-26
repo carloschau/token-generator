@@ -1,7 +1,6 @@
 package carloschau.tokengenerator.model.dto.request.token
 
 import com.fasterxml.jackson.annotation.JsonFormat
-import org.springframework.format.annotation.DateTimeFormat
 import java.util.*
 
 data class  CreateTokenGroup(
