@@ -14,8 +14,11 @@ import org.bson.types.Binary
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
+import javax.crypto.SecretKey
 
 @Service
 class TokenGenerationService{
@@ -27,10 +30,10 @@ class TokenGenerationService{
     @Autowired
     private lateinit var tokenRepository: TokenRepository
 
-    fun getToken(uuidStr: String, type: TokenType, media: String?): Token? {
+    fun getToken(uuidStr: String, type: TokenType, media: String?): String {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
-        val tokenGroup = tokenGroupRepository.findByUuid(Binary( UuidUtil.toBytes(uuid)))
-        logger?.debug("Token Group with uuid {} is {}".format(uuid,  tokenGroup?.id?:"Not Found"))
+        val tokenGroup = tokenGroupRepository.findByUuid(uuid)
+        logger?.debug("Token Group with uuid $uuid is ${tokenGroup?.id?:"Not Found"}")
 
         return tokenGroup?.let { group ->
             val token = Token().apply {
@@ -40,8 +43,19 @@ class TokenGenerationService{
                 this.type = type
                 this.issueAt = Date()
             }
-            token
-        }
+            val jwt = generateJwtByToken(token, group.signingKey!!)
+            tokenRepository.save(token)
+            jwt
+        } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Token group not found with uuid")
+    }
+
+    fun generateJwtByToken(token: Token, signingKey: SecretKey): String{
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .setIssuedAt(Date())
+                .setId(token.uuid.toString())
+                .signWith(signingKey)
+                .compact()
     }
 
     fun createTokenGroup(createTokenGroup : CreateTokenGroup, userId: String): String{

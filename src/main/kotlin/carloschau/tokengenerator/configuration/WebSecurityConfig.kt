@@ -29,7 +29,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             http.addFilterAfter(getTokenAuthenticationFilter(), RequestHeaderAuthenticationFilter::class.java)
                     .authenticationProvider(getPreAuthenticatedAuthenticationProvider())
                     .authorizeRequests()
-                    .antMatchers("/auth/**")
+                    .antMatchers("/auth/**", "/token/**")
                     .permitAll()
                     .antMatchers("/**")
                     .authenticated()

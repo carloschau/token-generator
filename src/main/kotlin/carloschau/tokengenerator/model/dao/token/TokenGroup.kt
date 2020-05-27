@@ -21,16 +21,16 @@ class TokenGroup
     var maxTokenIssuance: Int = 0
     var effectiveDate: Date? = null
     var expiryDate : Date? = null
-    @Transient
+//    @Transient
     var uuid: UUID? = null
-    set(value) {
-        uuidBinary = value?.let { UuidUtil.toBytes(it) }?.let { Binary(it) }
-        field = value
-    }
-    get()  {
-        field = uuidBinary?.let { UUID.nameUUIDFromBytes(it.data) }
-        return field
-    }
+//    set(value) {
+//        uuidBinary = value?.let { Binary( UuidUtil.toBytes(it)) }
+//        field = value
+//    }
+//    get()  {
+//        field = uuidBinary?.let { UUID.nameUUIDFromBytes(it.data) }
+//        return field
+//    }
 
     @Transient
     var signingKey: SecretKey? = null
@@ -42,9 +42,9 @@ class TokenGroup
         field = signingKeyBinary?.data?.let {  Keys.hmacShaKeyFor(it) }
         return field
     }
-
-    @Field("uuid")
-    private var uuidBinary: Binary? = null
+//
+//    @Field("uuid")
+//    private var uuidBinary: Binary? = null
 
     @Field("signingKey")
     private var signingKeyBinary: Binary? = null

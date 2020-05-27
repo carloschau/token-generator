@@ -18,6 +18,7 @@ java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
     mavenCentral()
+    maven(url = "https://jitpack.io")
 }
 dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.41")
@@ -28,6 +29,7 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-reflect:1.3.41")
     implementation ("io.jsonwebtoken:jjwt-api:0.11.1")
     implementation ("de.mkammerer:argon2-jvm:2.5")
+    implementation ("com.github.kenglxn.QRGen:javase:2.6.0")
     runtimeOnly ("io.jsonwebtoken:jjwt-impl:0.11.1")
     runtimeOnly ("io.jsonwebtoken:jjwt-jackson:0.11.1")
     testImplementation ("org.jetbrains.kotlin:kotlin-test:1.3.41")

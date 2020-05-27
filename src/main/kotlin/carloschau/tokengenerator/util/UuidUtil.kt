@@ -14,7 +14,6 @@ object UuidUtil {
     {
         val uuidWithDash = name.replaceFirst( "([0-9a-fA-F]{8})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]{4})([0-9a-fA-F]+)".toRegex()
                                                 , "$1-$2-$3-$4-$5" )
-        logger.info(uuidWithDash)
         return UUID.fromString(uuidWithDash)
     }
 
