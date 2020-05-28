@@ -6,8 +6,6 @@ enum class TokenType(val value: String) {
 
     companion object{
         private val map = TokenType.values().associateBy(TokenType::value)
-        fun fromValue(value: String){
-            map[value]
-        }
+        fun fromValue(value: String) = map[value]
     }
 }

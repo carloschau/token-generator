@@ -34,22 +34,24 @@ class ApiController {
     fun token(
             @PathVariable uuid: String,
             @RequestParam("typ") type: String?,
-            @RequestParam("media") media: String?
-    ): Any {
-        return when(type){
-            TokenType.QRCode.value, null -> TokenType.QRCode
-            TokenType.Text.value -> TokenType.Text
-            else -> throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Token type not found")
+            @RequestParam("media") media: String?,
+            @RequestParam("size") size: Int?
+    ): ResponseEntity<Any> {
+        return type.let{
+            TokenType.fromValue(type ?: TokenType.QRCode.value) ?:
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Value $type for parameter [typ] is incorrect")
         }.let { tokenType ->
-            logger.debug("Generating token.... uuid:$uuid, type: ${type}, media: $media")
+            logger.info("Generating token.... uuid:$uuid, type: ${type}, media: $media")
             val jwt = tokenGenerationService.getToken(uuid, tokenType, media)
             when (tokenType){
                 TokenType.QRCode ->
                     ResponseEntity.ok()
                             .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE)
-                            .body(QRCodeUtil.generateQRCode(jwt))
-                TokenType.Text -> ResponseEntity.ok(jwt)
-
+                            .body(QRCodeUtil.generateQRCode(jwt, size))
+                TokenType.Text ->
+                    ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
+                        .body(jwt)
             }
         }
     }
