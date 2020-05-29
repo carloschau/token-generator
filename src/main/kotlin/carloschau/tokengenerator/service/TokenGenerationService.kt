@@ -10,7 +10,6 @@ import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
-import org.bson.types.Binary
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -64,8 +63,8 @@ class TokenGenerationService{
             this.uuid = UUID.randomUUID()
             this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
             this.ownerId = userId
-            this.effectiveDate = createTokenGroup.effectiveDate
-            this.expiryDate = createTokenGroup.expiryDate
+            this.effectiveFrom = createTokenGroup.effectiveFrom
+            this.effectiveTo = createTokenGroup.effectiveTo
             this.maxTokenIssuance = createTokenGroup.maxTokenIssuance
         }
 

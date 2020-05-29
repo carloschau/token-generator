@@ -6,8 +6,9 @@ import java.util.*
 data class  CreateTokenGroup(
         val name: String = "",
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        val effectiveDate: Date? = null,
+        val effectiveFrom: Date? = null,
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-        val expiryDate: Date? = null,
-        val maxTokenIssuance: Int = 0
+        val effectiveTo: Date? = null,
+        val maxTokenIssuance: Int = 0,
+        val tokenLifetime: Int = 0
 )

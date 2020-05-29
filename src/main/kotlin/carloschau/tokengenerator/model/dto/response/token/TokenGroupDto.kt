@@ -19,8 +19,8 @@ data class TokenGroupDto (val Id: String? = null,
             tokenGroup.ownerId,
             tokenGroup.numberOfTokenIssued,
             tokenGroup.maxTokenIssuance,
-            tokenGroup.effectiveDate,
-            tokenGroup.expiryDate,
+            tokenGroup.effectiveFrom,
+            tokenGroup.effectiveTo,
             tokenGroup.uuid?.toString(),
             tokenGroup.signingKey?.encoded.let { Base64.getEncoder().encodeToString(it) }
     )

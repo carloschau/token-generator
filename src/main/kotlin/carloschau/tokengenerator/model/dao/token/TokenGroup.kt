@@ -1,6 +1,5 @@
 package carloschau.tokengenerator.model.dao.token
 
-import carloschau.tokengenerator.util.UuidUtil
 import io.jsonwebtoken.security.Keys
 import org.bson.types.Binary
 import org.springframework.data.annotation.Id
@@ -19,18 +18,11 @@ class TokenGroup
     var ownerId: String? = null
     var numberOfTokenIssued: Int = 0
     var maxTokenIssuance: Int = 0
-    var effectiveDate: Date? = null
-    var expiryDate : Date? = null
-//    @Transient
+    var effectiveFrom: Date? = null
+    var effectiveTo : Date? = null
     var uuid: UUID? = null
-//    set(value) {
-//        uuidBinary = value?.let { Binary( UuidUtil.toBytes(it)) }
-//        field = value
-//    }
-//    get()  {
-//        field = uuidBinary?.let { UUID.nameUUIDFromBytes(it.data) }
-//        return field
-//    }
+    var tokenLifetime : Int = 0
+    var isActive : Boolean = true
 
     @Transient
     var signingKey: SecretKey? = null
@@ -42,9 +34,12 @@ class TokenGroup
         field = signingKeyBinary?.data?.let {  Keys.hmacShaKeyFor(it) }
         return field
     }
-//
-//    @Field("uuid")
-//    private var uuidBinary: Binary? = null
+
+    val canIssueToken : Boolean = isActive &&
+            if (effectiveFrom != null && effectiveTo != null)
+                Date() in effectiveFrom!!..effectiveTo!!
+            else
+                true
 
     @Field("signingKey")
     private var signingKeyBinary: Binary? = null
