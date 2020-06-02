@@ -1,14 +1,12 @@
 package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
-import carloschau.tokengenerator.model.dto.response.token.TokenDto
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
 import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import carloschau.tokengenerator.util.QRCodeUtil
-import io.jsonwebtoken.Header
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -38,17 +36,17 @@ class TokenController {
             @RequestParam("size") size: Int?
     ): ResponseEntity<Any> {
         return type.let{
-            TokenType.fromValue(type ?: TokenType.QRCode.value) ?:
+            TokenType.fromValue(type ?: TokenType.QR_CODE.value) ?:
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Value $type for parameter [typ] is incorrect")
         }.let { tokenType ->
             logger.info("Generating token.... uuid:$uuid, type: ${type}, media: $media")
-            val jwt = tokenGenerationService.getToken(uuid, tokenType, media)
+            val jwt = tokenGenerationService.generateToken(uuid, tokenType, media)
             when (tokenType){
-                TokenType.QRCode ->
+                TokenType.QR_CODE ->
                     ResponseEntity.ok()
                             .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE)
                             .body(QRCodeUtil.generateQRCode(jwt, size))
-                TokenType.Text ->
+                TokenType.TEXT ->
                     ResponseEntity.ok()
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN_VALUE)
                         .body(jwt)

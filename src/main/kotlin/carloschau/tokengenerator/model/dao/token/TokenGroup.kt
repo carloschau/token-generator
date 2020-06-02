@@ -35,12 +35,30 @@ class TokenGroup
         return field
     }
 
-    val canIssueToken : Boolean = isActive &&
-            if (effectiveFrom != null && effectiveTo != null)
-                Date() in effectiveFrom!!..effectiveTo!!
-            else
-                true
-
     @Field("signingKey")
     private var signingKeyBinary: Binary? = null
+
+    val canIssueToken : Boolean =
+            isActive && !isGroupExpired && !isGroupIneffectiveYet
+
+    val isGroupExpired: Boolean get() = effectiveTo != null && Date().after(effectiveTo)
+    val isGroupIneffectiveYet: Boolean get() = effectiveFrom != null && Date().before(effectiveFrom)
+
+    val tokenGroupStatus : TokenGroupStatus get() {
+        return when {
+            canIssueToken -> TokenGroupStatus.VALID
+            !isActive -> TokenGroupStatus.INACTIVE
+            isGroupExpired -> TokenGroupStatus.EXPIRED
+            isGroupIneffectiveYet -> TokenGroupStatus.INEFFECTIVE_YET
+            else -> TokenGroupStatus.UNKNOWN
+        }
+    }
+}
+
+enum class TokenGroupStatus(val reason: String){
+    VALID("The token group can issue tokens"),
+    INACTIVE("The token group is inactive"),
+    EXPIRED("The token group is expired"),
+    INEFFECTIVE_YET("The token group is ineffective yet"),
+    UNKNOWN("Unknown reason")
 }

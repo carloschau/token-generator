@@ -29,18 +29,23 @@ class TokenGenerationService{
     @Autowired
     private lateinit var tokenRepository: TokenRepository
 
-    fun getToken(uuidStr: String, type: TokenType, media: String?): String {
+    fun generateToken(uuidStr: String, type: TokenType, media: String?): String {
         val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
         val tokenGroup = tokenGroupRepository.findByUuid(uuid)
         logger?.debug("Token Group with uuid $uuid is ${tokenGroup?.id?:"Not Found"}")
 
         return tokenGroup?.let { group ->
+            if (!group.canIssueToken)
+                throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                        group.tokenGroupStatus.reason)
             val token = Token().apply {
                 this.uuid = UUID.randomUUID()
                 this.media = media
                 this.groupId = tokenGroup.id
                 this.type = type
                 this.issueAt = Date()
+                if (group.tokenLifetime > 0)
+                    this.expireAt = Date(issueAt.time + group.tokenLifetime * 1000)
             }
             val jwt = generateJwtByToken(token, group.signingKey!!)
             tokenRepository.save(token)

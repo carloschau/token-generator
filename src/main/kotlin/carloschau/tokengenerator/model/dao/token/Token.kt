@@ -7,13 +7,13 @@ import java.util.*
 
 @Document
 data class Token (
-    @Id
+        @Id
     var id: String? = null,
-    var uuid: UUID? = null,
-    var groupId: String? = null,
-    var media: String? = null,
-    var type: TokenType = TokenType.Text,
-    var issueAt: Date = Date(),
-    var expireAt: Date? = null,
-    var isActive: Boolean = true
+        var uuid: UUID? = null,
+        var groupId: String? = null,
+        var media: String? = null,
+        var type: TokenType = TokenType.TEXT,
+        var issueAt: Date = Date(),
+        var expireAt: Date? = null,
+        var isActive: Boolean = true
 )

@@ -47,7 +47,7 @@ class UserAuthenticationController {
                             Claims.SUBJECT to user.username,
                             Claims.ID to authenticationToken.accessToken,
                             Claims.EXPIRATION to authenticationToken.expiration,
-                            Claims.ISSUED_AT to authenticationToken.expiration
+                            Claims.ISSUED_AT to authenticationToken.issueAt
                     )
                     jwtTokenUtil.getJwt(claims)
                 }

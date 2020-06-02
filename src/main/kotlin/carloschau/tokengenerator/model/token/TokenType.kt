@@ -1,8 +1,8 @@
 package carloschau.tokengenerator.model.token
 
 enum class TokenType(val value: String) {
-    Text("text"),
-    QRCode("qr");
+    TEXT("text"),
+    QR_CODE("qr");
 
     companion object{
         private val map = TokenType.values().associateBy(TokenType::value)
