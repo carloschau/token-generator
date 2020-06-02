@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException
 import javax.validation.Valid
 
 @RestController
-class ApiController {
+class TokenController {
     val logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
