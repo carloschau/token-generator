@@ -48,7 +48,9 @@ class TokenGenerationService{
                     this.expireAt = Date(issueAt.time + group.tokenLifetime * 1000)
             }
             val jwt = generateJwtByToken(token, group.signingKey!!)
+
             tokenRepository.save(token)
+            tokenGroupRepository.incNumberOfTokenIssued(group.id!!)
             jwt
         } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Token group not found with uuid")
     }
