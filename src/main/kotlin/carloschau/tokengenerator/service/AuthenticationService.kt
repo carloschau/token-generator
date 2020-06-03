@@ -27,7 +27,7 @@ class AuthenticationService {
     fun issueAuthenticationToken(user : User, userAgent : String) : AuthenticationToken
     {
         val expiration = Date(System.currentTimeMillis() + TOKEN_EXPIRE_SECONDS.toInt() * 1000)
-        val accessToken = UUID.randomUUID().toString()
+        val accessToken = UUID.randomUUID()
 
         val authenticationToken = AuthenticationToken(
                 userId = user.id!!,

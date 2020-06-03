@@ -11,7 +11,7 @@ data class AuthenticationToken(
         var userId : String,
         var issueAt : Date,
         var expiration : Date,
-        var accessToken : String,
+        var accessToken : UUID,
         var device : String,
         var isValid : Boolean = true
 )
