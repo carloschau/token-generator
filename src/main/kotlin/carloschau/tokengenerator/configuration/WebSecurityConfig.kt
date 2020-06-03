@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter
@@ -26,7 +27,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
             http.formLogin().disable()
             http.logout().disable()
 
-            http.addFilterAfter(getTokenAuthenticationFilter(), RequestHeaderAuthenticationFilter::class.java)
+            http.addFilter(getTokenAuthenticationFilter())
                     .authenticationProvider(getPreAuthenticatedAuthenticationProvider())
                     .authorizeRequests()
                     .antMatchers("/auth/**", "/token/**")
@@ -56,6 +57,7 @@ class WebSecurityConfig : WebSecurityConfigurerAdapter() {
         return TokenAuthenticationFilter().apply {
             setAuthenticationManager(authenticationManager())
             setAuthenticationDetailsSource(getPreAuthenticationDetailsSource())
+            setAuthenticationFailureHandler(SimpleUrlAuthenticationFailureHandler())
         }
     }
 

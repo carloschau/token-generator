@@ -63,6 +63,6 @@ enum class TokenGroupStatus(val reason: String = ""){
     INACTIVE("The token group is inactive"),
     EXPIRED("The token group is expired"),
     INEFFECTIVE_YET("The token group is ineffective yet"),
-    MAX_ISSUANCE_REACHED("The token group reached it's max token issuance"),
+    MAX_ISSUANCE_REACHED("The token group reached it's max number of token issuance"),
     UNKNOWN("Unknown reason")
 }

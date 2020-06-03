@@ -1,10 +1,6 @@
 package carloschau.tokengenerator.util
 
-import carloschau.tokengenerator.model.dao.user.User
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -33,8 +29,14 @@ class JwtTokenUtil{
                 .compact()
     }
 
-    fun parseClaimsJws(jwt: String): Jws<Claims>{
-        return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(jwt)
+    fun parseClaimsJws(jwt: String): Jws<Claims>?{
+        return try {
+            Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(jwt)
+        }
+        catch (e: JwtException){
+            logger.error(e.toString())
+            null
+        }
     }
 
     private val privateKey get() : PrivateKey{
