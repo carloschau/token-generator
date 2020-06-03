@@ -31,16 +31,18 @@ class TokenController {
     @GetMapping("/token/{uuid}")
     fun token(
             @PathVariable uuid: String,
-            @RequestParam("typ") type: String?,
-            @RequestParam("media") media: String?,
-            @RequestParam("size") size: Int?
+            @RequestParam requestParam: Map<String, String>
     ): ResponseEntity<Any> {
+        val type: String? = requestParam["typ"]
+        val media: String? = requestParam["media"]
+        val size: Int? = requestParam["size"]?.toInt()
         return type.let{
             TokenType.fromValue(type ?: TokenType.QR_CODE.value) ?:
                 throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Value $type for parameter [typ] is incorrect")
         }.let { tokenType ->
             logger.info("Generating token.... uuid:$uuid, type: ${type}, media: $media")
-            val jwt = tokenGenerationService.generateToken(uuid, tokenType, media)
+
+            val jwt = tokenGenerationService.generateToken(uuid, tokenType, media, requestParam)
             when (tokenType){
                 TokenType.QR_CODE ->
                     ResponseEntity.ok()

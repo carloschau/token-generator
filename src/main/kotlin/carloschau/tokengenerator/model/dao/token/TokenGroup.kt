@@ -23,6 +23,7 @@ class TokenGroup
     var uuid: UUID? = null
     var tokenLifetime : Int = 0
     var isActive : Boolean = true
+    var pattern : String? = null
 
     @Transient
     var signingKey: SecretKey? = null
@@ -62,7 +63,7 @@ enum class TokenGroupStatus(val reason: String = ""){
     VALID("The token group can issue tokens"),
     INACTIVE("The token group is inactive"),
     EXPIRED("The token group is expired"),
-    INEFFECTIVE_YET("The token group is ineffective yet"),
+    INEFFECTIVE_YET("The token group is not effective yet"),
     MAX_ISSUANCE_REACHED("The token group reached it's max number of token issuance"),
     UNKNOWN("Unknown reason")
 }
