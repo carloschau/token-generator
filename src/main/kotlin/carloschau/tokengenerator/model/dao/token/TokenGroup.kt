@@ -1,5 +1,6 @@
 package carloschau.tokengenerator.model.dao.token
 
+import carloschau.tokengenerator.constant.token.TokenGroupPatternPlaceholder
 import io.jsonwebtoken.security.Keys
 import org.bson.types.Binary
 import org.springframework.data.annotation.Id
@@ -55,6 +56,31 @@ class TokenGroup
             isGroupIneffectiveYet -> TokenGroupStatus.INEFFECTIVE_YET
             isMaxTokenIssuanceReached -> TokenGroupStatus.MAX_ISSUANCE_REACHED
             else -> TokenGroupStatus.UNKNOWN
+        }
+    }
+
+    fun validatePattern() : Boolean {
+        if (pattern.isNullOrEmpty())
+            return false
+        else
+        {
+            val regex = "\\{.*?}".toRegex()
+            val params = regex.findAll(pattern!!).map {
+                it.value.trimStart('{').trimEnd('}')
+            }.toSet()
+
+            if (params.isEmpty())
+                return false
+
+            if (params.size > 1 &&
+                    params.contains(TokenGroupPatternPlaceholder.EMPTY))
+                return false
+
+            if (!params.contains(TokenGroupPatternPlaceholder.EMPTY) &&
+                    !params.contains(TokenGroupPatternPlaceholder.TOKEN))
+                return false
+            
+            return true
         }
     }
 }

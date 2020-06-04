@@ -88,8 +88,8 @@ class TokenGenerationService{
             result = when(it){
                 "" -> {
                     if (paramList.size > 1) {
-                        logger.warn("Invalid token pattern! {} found while more than 1 parameter in pattern")
-                        return jwt
+                        logger.error("Invalid token pattern! {} found while more than 1 parameter in pattern")
+                        throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
                     }
                     result.replace("{$it}", jwt)
                 }
@@ -113,7 +113,7 @@ class TokenGenerationService{
             this.pattern = createTokenGroup.pattern
         }
 
-        logger?.debug("Token group uuid created: ${ tokenGroup.uuid }")
+        logger.debug("Token group uuid created: ${ tokenGroup.uuid }")
         tokenGroupRepository.save(tokenGroup)
         return tokenGroup.uuid.toString()
     }
