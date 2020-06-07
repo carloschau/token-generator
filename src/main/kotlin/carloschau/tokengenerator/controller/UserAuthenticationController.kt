@@ -31,7 +31,7 @@ class UserAuthenticationController {
     @PostMapping("/login")
     fun login(@RequestBody @Valid request : Login, @RequestHeader("user-agent") userAgent : String) : ResponseEntity<LoginDto>
     {
-        val user = userService.authenticate(request.email, request.password)
+        val user = userService.authenticate(request.username, request.password)
         return user?.let {
             val loginStatus =
                     when (user.status) {
