@@ -1,5 +1,6 @@
 package carloschau.tokengenerator.service
 
+import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
 import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.dao.token.Token
@@ -73,29 +74,31 @@ class TokenGenerationService{
 
     fun massageWithPattern(pattern: String, jwt: String, paramSource: Map<String, String>): String{
         val regex = "\\{.*?}".toRegex()
-        val paramList = regex.findAll(pattern).map {
+        val params = regex.findAll(pattern).map {
             it.value.trimStart('{').trimEnd('}')
         }.toSet()
 
-        if (!paramList.contains("") && !paramList.contains("token"))
+        if (!params.contains(TokenPatternPlaceholder.EMPTY) && !params.contains(TokenPatternPlaceholder.TOKEN))
         {
-            logger.warn("Invalid token pattern! token placeholder({} or {token}) not found")
-            return jwt
+            "Invalid token pattern! token placeholder({} or {token}) not found".also(logger::warn).also {
+                throw Exception(it)
+            }
         }
 
         var result = pattern
-        paramList.forEach {
+        params.forEach {
             result = when(it){
-                "" -> {
-                    if (paramList.size > 1) {
+                TokenPatternPlaceholder.EMPTY -> {
+                    if (params.size > 1) {
                         logger.error("Invalid token pattern! {} found while more than 1 parameter in pattern")
                         throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
                     }
                     result.replace("{$it}", jwt)
                 }
-                "token" ->
+                TokenPatternPlaceholder.TOKEN ->
                     result.replace("{$it}", jwt)
-                else -> result.replace("{$it}",paramSource.getValue(it))
+                else ->
+                    result.replace("{$it}",paramSource.getValue(it))
             }
         }
         return result
@@ -113,7 +116,10 @@ class TokenGenerationService{
             this.pattern = createTokenGroup.pattern
         }
 
-        logger.debug("Token group uuid created: ${ tokenGroup.uuid }")
+        if (!tokenGroup.pattern.isNullOrEmpty() && !tokenGroup.validatePattern())
+            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Token pattern is not empty but not valid")
+
+        logger.info("Token group uuid created: ${ tokenGroup.uuid }")
         tokenGroupRepository.save(tokenGroup)
         return tokenGroup.uuid.toString()
     }

@@ -1,5 +1,6 @@
 package carloschau.tokengenerator.controller
 
+import carloschau.tokengenerator.constant.token.TokenParameter
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
 import carloschau.tokengenerator.model.token.TokenType
@@ -7,6 +8,7 @@ import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenGenerationService
 import carloschau.tokengenerator.service.UserService
 import carloschau.tokengenerator.util.QRCodeUtil
+import com.sun.net.httpserver.HttpContext
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -25,20 +27,17 @@ class TokenController {
     @Autowired
     private lateinit var tokenGenerationService : TokenGenerationService
 
-    @Autowired
-    private lateinit var userService : UserService
-
     @GetMapping("/token/{uuid}")
     fun token(
             @PathVariable uuid: String,
             @RequestParam requestParam: Map<String, String>
     ): ResponseEntity<Any> {
-        val type: String? = requestParam["typ"]
-        val media: String? = requestParam["media"]
-        val size: Int? = requestParam["size"]?.toInt()
+        val type: String? = requestParam[TokenParameter.TYPE]
+        val media: String? = requestParam[TokenParameter.MEDIA]
+        val size: Int? = requestParam[TokenParameter.SIZE]?.toInt()
         return type.let{
             TokenType.fromValue(type ?: TokenType.QR_CODE.value) ?:
-                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Value $type for parameter [typ] is incorrect")
+                throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Value $type for parameter [${TokenParameter.TYPE}] is incorrect")
         }.let { tokenType ->
             logger.info("Generating token.... uuid:$uuid, type: ${type}, media: $media")
 
