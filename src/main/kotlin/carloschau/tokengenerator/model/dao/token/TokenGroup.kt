@@ -1,6 +1,6 @@
 package carloschau.tokengenerator.model.dao.token
 
-import carloschau.tokengenerator.constant.token.TokenGroupPatternPlaceholder
+import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
 import io.jsonwebtoken.security.Keys
 import org.bson.types.Binary
 import org.springframework.data.annotation.Id
@@ -64,24 +64,26 @@ class TokenGroup
             return false
         else
         {
-            val regex = "\\{.*?}".toRegex()
-            val params = regex.findAll(pattern!!).map {
-                it.value.trimStart('{').trimEnd('}')
-            }.toSet()
-
+            val params = patternParameters
             if (params.isEmpty())
                 return false
 
             if (params.size > 1 &&
-                    params.contains(TokenGroupPatternPlaceholder.EMPTY))
+                    params.contains(TokenPatternPlaceholder.EMPTY))
                 return false
 
-            if (!params.contains(TokenGroupPatternPlaceholder.EMPTY) &&
-                    !params.contains(TokenGroupPatternPlaceholder.TOKEN))
+            if (!params.contains(TokenPatternPlaceholder.EMPTY) &&
+                    !params.contains(TokenPatternPlaceholder.TOKEN))
                 return false
             
             return true
         }
+    }
+
+    val patternParameters : Set<String> get() {
+        return "\\{.*?}".toRegex().findAll(pattern!!).map {
+            it.value.trimStart('{').trimEnd('}')
+        }.toSet()
     }
 }
 

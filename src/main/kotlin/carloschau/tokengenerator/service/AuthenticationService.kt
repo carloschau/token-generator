@@ -45,7 +45,7 @@ class AuthenticationService {
     //Verify token
     fun getUserByAccessToken(accessToken: String): User?
     {
-        val authenticationToken = authenticationTokenRepository.findByAccessToken(accessToken)
+        val authenticationToken = authenticationTokenRepository.findByAccessToken(UUID.fromString(accessToken))
         return authenticationToken?.let {
             userRepository.findById(authenticationToken.userId).orElse(null)?.let { user ->
                 if (user.status == UserStatus.ACTIVE)

@@ -6,6 +6,7 @@ import org.springframework.security.web.authentication.preauth.RequestHeaderAuth
 class TokenAuthenticationFilter : RequestHeaderAuthenticationFilter() {
 
     init {
+        //TODO: Use self-defined constant
         setPrincipalRequestHeader(AUTHORIZATION)
         setExceptionIfHeaderMissing(false)
     }
