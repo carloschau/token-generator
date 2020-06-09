@@ -52,7 +52,7 @@ class TokenGenerationService{
 
             val resultToken = generateJwtByToken(token, group.signingKey!!).let {jwt ->
                 if (!group.pattern.isNullOrBlank())
-                    massageWithPattern(group.pattern!!, jwt, paramSource)
+                    massageWithPattern(group, jwt, paramSource)
                 else
                     jwt
             }
@@ -72,31 +72,29 @@ class TokenGenerationService{
                 .compact()
     }
 
-    fun massageWithPattern(pattern: String, jwt: String, paramSource: Map<String, String>): String{
-        val regex = "\\{.*?}".toRegex()
-        val params = regex.findAll(pattern).map {
-            it.value.trimStart('{').trimEnd('}')
-        }.toSet()
 
-        if (!params.contains(TokenPatternPlaceholder.EMPTY) && !params.contains(TokenPatternPlaceholder.TOKEN))
+    private fun massageWithPattern(tokenGroup: TokenGroup, token: String, paramSource: Map<String, String>): String{
+        val patternParams = tokenGroup.patternParameters
+        if (!patternParams.contains(TokenPatternPlaceholder.EMPTY) && !patternParams.contains(TokenPatternPlaceholder.TOKEN))
         {
-            "Invalid token pattern! token placeholder({} or {token}) not found".also(logger::warn).also {
+            "Invalid token pattern! token placeholder({} or {token}) not found".also(logger::error).also {
                 throw Exception(it)
             }
         }
 
-        var result = pattern
-        params.forEach {
+        var result = tokenGroup.pattern!!
+        patternParams.forEach {
             result = when(it){
                 TokenPatternPlaceholder.EMPTY -> {
-                    if (params.size > 1) {
-                        logger.error("Invalid token pattern! {} found while more than 1 parameter in pattern")
-                        throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR)
+                    if (patternParams.size > 1) {
+                        "Invalid token pattern! {} found while more than 1 parameter in pattern".also(logger::error).also{ msg ->
+                            throw Exception(msg)
+                        }
                     }
-                    result.replace("{$it}", jwt)
+                    result.replace("{$it}", token)
                 }
                 TokenPatternPlaceholder.TOKEN ->
-                    result.replace("{$it}", jwt)
+                    result.replace("{$it}", token)
                 else ->
                     result.replace("{$it}",paramSource.getValue(it))
             }
