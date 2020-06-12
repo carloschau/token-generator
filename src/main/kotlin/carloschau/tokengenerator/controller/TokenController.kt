@@ -2,13 +2,15 @@ package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.constant.token.TokenParameter
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
+import carloschau.tokengenerator.model.dto.request.token.VerifyTokenRequest
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
+import carloschau.tokengenerator.model.dto.response.token.VerifyTokenDto
 import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.security.AuthenticationDetails
-import carloschau.tokengenerator.service.TokenGenerationService
-import carloschau.tokengenerator.service.UserService
+import carloschau.tokengenerator.service.token.TokenGenerationService
+import carloschau.tokengenerator.service.token.TokenGroupService
 import carloschau.tokengenerator.util.QRCodeUtil
-import com.sun.net.httpserver.HttpContext
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
@@ -22,10 +24,13 @@ import javax.validation.Valid
 
 @RestController
 class TokenController {
-    val logger = LoggerFactory.getLogger(javaClass)
+    val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     private lateinit var tokenGenerationService : TokenGenerationService
+
+    @Autowired
+    private lateinit var tokenGroupService : TokenGroupService
 
     @GetMapping("/token/{uuid}")
     fun token(
@@ -59,16 +64,24 @@ class TokenController {
     fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroup): String
     {
         val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-        return tokenGenerationService.createTokenGroup(request, authenticationDetails.userId)
+        return tokenGroupService.createTokenGroup(request, authenticationDetails.userId)
     }
 
     @GetMapping("/tokengroup")
     fun getAllTokenGroups() : List<TokenGroupDto>
     {
         val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-        return tokenGenerationService.findTokenGroupsByOwner(authenticationDetails.userId)
+        return tokenGroupService.findTokenGroupsByOwner(authenticationDetails.userId)
                 .map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
+
+    @PostMapping("/token/verify")
+    fun verifyToken(@RequestBody @Valid request : VerifyTokenRequest) : VerifyTokenDto
+    {
+        val tokenVerifyResult = tokenGenerationService.verifyToken(request.token)
+        return VerifyTokenDto(tokenVerifyResult.reason)
+    }
+
 
     @RequestMapping("/hello")
     fun hello(){

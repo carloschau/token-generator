@@ -8,7 +8,7 @@ import java.util.*
 @Document
 data class Token (
         @Id
-    var id: String? = null,
+        var id: String? = null,
         var uuid: UUID? = null,
         var groupId: String? = null,
         var media: String? = null,

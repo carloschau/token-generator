@@ -1,23 +1,21 @@
-package carloschau.tokengenerator.service
+package carloschau.tokengenerator.service.token
 
 import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
-import carloschau.tokengenerator.model.dao.token.TokenGroup
-import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.dao.token.Token
+import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.token.TokenType
+import carloschau.tokengenerator.model.token.TokenVerifyResult
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
 import carloschau.tokengenerator.util.UuidUtil
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.*
+import io.jsonwebtoken.security.SignatureException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.lang.Exception
 import java.util.*
 import javax.crypto.SecretKey
 
@@ -65,13 +63,13 @@ class TokenGenerationService{
 
     fun generateJwtByToken(token: Token, signingKey: SecretKey): String{
         return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
+                .setHeaderParam(JwsHeader.TYPE, JwsHeader.JWT_TYPE)
+                .setHeaderParam(JwsHeader.KEY_ID, token.groupId)
                 .setIssuedAt(Date())
                 .setId(token.uuid.toString())
                 .signWith(signingKey)
                 .compact()
     }
-
 
     private fun massageWithPattern(tokenGroup: TokenGroup, token: String, paramSource: Map<String, String>): String{
         val patternParams = tokenGroup.patternParameters
@@ -102,31 +100,38 @@ class TokenGenerationService{
         return result
     }
 
-    fun createTokenGroup(createTokenGroup : CreateTokenGroup, userId: String): String{
-        val tokenGroup = TokenGroup().apply {
-            this.name = createTokenGroup.name
-            this.uuid = UUID.randomUUID()
-            this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-            this.ownerId = userId
-            this.effectiveFrom = createTokenGroup.effectiveFrom
-            this.effectiveTo = createTokenGroup.effectiveTo
-            this.maxTokenIssuance = createTokenGroup.maxTokenIssuance
-            this.pattern = createTokenGroup.pattern
+    fun verifyToken(tokenStr : String): TokenVerifyResult{
+        return try {
+            getJwsFromString(tokenStr).let {
+                val uuidStr = it.body.id
+                val token = tokenRepository.findByUuid(UUID.fromString(uuidStr))
+                when{
+                    token == null -> TokenVerifyResult.NOT_FOUND
+                    !token.isActive -> TokenVerifyResult.REVOKED
+                    else -> TokenVerifyResult.SUCCESS
+                }
+            }
         }
-
-        if (!tokenGroup.pattern.isNullOrEmpty() && !tokenGroup.validatePattern())
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Token pattern is not empty but not valid")
-
-        logger.info("Token group uuid created: ${ tokenGroup.uuid }")
-        tokenGroupRepository.save(tokenGroup)
-        return tokenGroup.uuid.toString()
+        catch (signEx: SignatureException){
+            TokenVerifyResult.SIGNATURE_INVALID
+        }
+        catch (expiredEx: ExpiredJwtException){
+            TokenVerifyResult.EXPIRED
+        }
+        catch (e: Exception){
+            TokenVerifyResult.UNKNOWN
+        }
     }
 
-    fun findTokenGroupsByOwner(userId: String) : List<TokenGroup>{
-        return tokenGroupRepository.findByOwnerId(userId)
+    fun getJwsFromString(jwtStr: String) : Jws<Claims> {
+        return Jwts.parserBuilder()
+                .setSigningKeyResolver(tokenGroupSigningKeyResolverWrapper())
+                .build()
+                .parseClaimsJws(jwtStr)
     }
 
-    fun findAllTokenGroup() : List<TokenGroup>{
-        return tokenGroupRepository.findAll().filterNotNull()
+    @Autowired
+    fun tokenGroupSigningKeyResolverWrapper(): TokenGroupSigningKeyResolver{
+        return TokenGroupSigningKeyResolver()
     }
 }

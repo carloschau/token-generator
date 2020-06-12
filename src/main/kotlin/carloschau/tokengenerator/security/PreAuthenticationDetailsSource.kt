@@ -28,13 +28,17 @@ class PreAuthenticationDetailsSource : AuthenticationDetailsSource<HttpServletRe
                             throw PreAuthenticatedCredentialsNotFoundException(
                                     "{} header not starts with {}".format(authenticationHeader, BEARER))
 
-            jwtTokenUtil.parseClaimsJws(jwtStr)?.let {jws ->
-                val accessToken = jws.body.id
-                val user =  authenticationService.getUserByAccessToken(accessToken)
-                user?.let {
-                    AuthenticationDetails(user)
-                } ?: throw BadCredentialsException("User not found by access token")
-            } ?: throw BadCredentialsException("Authentication token expired")
+            try {
+                jwtTokenUtil.parseClaimsJws(jwtStr).let { jws ->
+                    val accessToken = jws.body.id
+                    val user = authenticationService.getUserByAccessToken(accessToken)
+                    user?.let {
+                        AuthenticationDetails(user)
+                    } ?: throw BadCredentialsException("User not found by access token")
+                }
+            } catch (e: Exception) {
+                throw BadCredentialsException("Authentication token expired")
+            }
         }
     }
 

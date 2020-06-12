@@ -29,15 +29,10 @@ class JwtTokenUtil{
                 .compact()
     }
 
-    fun parseClaimsJws(jwt: String): Jws<Claims>?{
-        return try {
-            Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(jwt)
-        }
-        catch (e: JwtException){
-            logger.error(e.toString())
-            null
-        }
+    fun parseClaimsJws(jwt: String): Jws<Claims>{
+        return Jwts.parserBuilder().setSigningKey(publicKey).build().parseClaimsJws(jwt)
     }
+
 
     private val privateKey get() : PrivateKey{
         val byteArray = getByteArrayByFilename(authKeyFilename)
