@@ -6,6 +6,7 @@ import carloschau.tokengenerator.model.dto.request.token.VerifyTokenRequest
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
 import carloschau.tokengenerator.model.dto.response.token.VerifyTokenDto
 import carloschau.tokengenerator.model.token.TokenType
+import carloschau.tokengenerator.model.token.TokenVerifyResult
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.token.TokenGenerationService
 import carloschau.tokengenerator.service.token.TokenGroupService
@@ -76,10 +77,14 @@ class TokenController {
     }
 
     @PostMapping("/token/verify")
-    fun verifyToken(@RequestBody @Valid request : VerifyTokenRequest) : VerifyTokenDto
+    fun verifyToken(@RequestBody @Valid request : VerifyTokenRequest) : ResponseEntity<VerifyTokenDto>
     {
         val tokenVerifyResult = tokenGenerationService.verifyToken(request.token)
-        return VerifyTokenDto(tokenVerifyResult.reason)
+        val responseStatus = when (tokenVerifyResult){
+            TokenVerifyResult.SUCCESS -> HttpStatus.OK
+            else -> HttpStatus.INTERNAL_SERVER_ERROR
+        }
+        return ResponseEntity(VerifyTokenDto(tokenVerifyResult.reason), responseStatus)
     }
 
 

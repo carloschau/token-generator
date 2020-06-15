@@ -13,6 +13,7 @@ import io.jsonwebtoken.security.SignatureException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -65,8 +66,14 @@ class TokenGenerationService{
         return Jwts.builder()
                 .setHeaderParam(JwsHeader.TYPE, JwsHeader.JWT_TYPE)
                 .setHeaderParam(JwsHeader.KEY_ID, token.groupId)
-                .setIssuedAt(Date())
+                .setIssuedAt(token.issueAt)
                 .setId(token.uuid.toString())
+                .run {
+                    if (token.expireAt != null)
+                        setExpiration(token.expireAt)
+                    else
+                        this
+                }
                 .signWith(signingKey)
                 .compact()
     }
@@ -113,12 +120,15 @@ class TokenGenerationService{
             }
         }
         catch (signEx: SignatureException){
+            signEx.toString().also(logger::error)
             TokenVerifyResult.SIGNATURE_INVALID
         }
         catch (expiredEx: ExpiredJwtException){
+            expiredEx.toString().also(logger::error)
             TokenVerifyResult.EXPIRED
         }
         catch (e: Exception){
+            e.toString().also(logger::error)
             TokenVerifyResult.UNKNOWN
         }
     }
@@ -130,8 +140,7 @@ class TokenGenerationService{
                 .parseClaimsJws(jwtStr)
     }
 
-    @Autowired
     fun tokenGroupSigningKeyResolverWrapper(): TokenGroupSigningKeyResolver{
-        return TokenGroupSigningKeyResolver()
+        return TokenGroupSigningKeyResolver(tokenGroupRepository)
     }
 }

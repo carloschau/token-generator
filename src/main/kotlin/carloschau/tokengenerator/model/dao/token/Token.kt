@@ -15,5 +15,16 @@ data class Token (
         var type: TokenType = TokenType.TEXT,
         var issueAt: Date = Date(),
         var expireAt: Date? = null,
-        var isActive: Boolean = true
+        var isActive: Boolean = true,
+        var disableDetail: TokenDisableDetail?  = null
 )
+
+data class TokenDisableDetail(
+        var action: TokenDisableAction,
+        var date: Date
+)
+
+enum class TokenDisableAction{
+        CONSUMED,
+        REVOKED
+}

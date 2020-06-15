@@ -9,13 +9,9 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import java.security.Key
 
-@Component
-class TokenGroupSigningKeyResolver : SigningKeyResolverAdapter() {
-    @Autowired
-    private lateinit var tokenGroupRepository: TokenGroupRepository
-
-    override fun resolveSigningKey(header: JwsHeader<out JwsHeader<*>>?, claims: Claims?): Key {
-        val groupId = header!!.keyId
+class TokenGroupSigningKeyResolver(private val tokenGroupRepository: TokenGroupRepository) : SigningKeyResolverAdapter() {
+    override fun resolveSigningKey(header: JwsHeader<*>, claims: Claims): Key {
+        val groupId = header[JwsHeader.KEY_ID] as String
         return tokenGroupRepository.findByIdOrNull(groupId)!!.signingKey!!
     }
 }
