@@ -2,6 +2,7 @@ package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.constant.token.TokenParameter
 import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
+import carloschau.tokengenerator.model.dto.request.token.RevokeTokenRequest
 import carloschau.tokengenerator.model.dto.request.token.VerifyTokenRequest
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
 import carloschau.tokengenerator.model.dto.response.token.VerifyTokenDto
@@ -85,6 +86,14 @@ class TokenController {
             else -> HttpStatus.INTERNAL_SERVER_ERROR
         }
         return ResponseEntity(VerifyTokenDto(tokenVerifyResult.reason), responseStatus)
+    }
+
+    @DeleteMapping("/token")
+    fun revokeToken(@RequestBody @Valid request : RevokeTokenRequest): ResponseEntity<Any>{
+        return if (tokenGenerationService.revokeToken(request.uuid))
+            ResponseEntity(HttpStatus.OK)
+        else
+            ResponseEntity(HttpStatus.BAD_REQUEST)
     }
 
 

@@ -2,6 +2,8 @@ package carloschau.tokengenerator.service.token
 
 import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
 import carloschau.tokengenerator.model.dao.token.Token
+import carloschau.tokengenerator.model.dao.token.TokenDisableAction
+import carloschau.tokengenerator.model.dao.token.TokenDisableDetail
 import carloschau.tokengenerator.model.dao.token.TokenGroup
 import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.model.token.TokenVerifyResult
@@ -112,10 +114,19 @@ class TokenGenerationService{
             getJwsFromString(tokenStr).let {
                 val uuidStr = it.body.id
                 val token = tokenRepository.findByUuid(UUID.fromString(uuidStr))
+
                 when{
                     token == null -> TokenVerifyResult.NOT_FOUND
-                    !token.isActive -> TokenVerifyResult.REVOKED
-                    else -> TokenVerifyResult.SUCCESS
+                    !token.isActive && token.disableDetail!!.action == TokenDisableAction.REVOKED
+                            -> TokenVerifyResult.REVOKED
+                    !token.isActive && token.disableDetail!!.action == TokenDisableAction.CONSUMED
+                            -> TokenVerifyResult.CONSUMED
+                    else -> {
+                        token.isActive = false
+                        token.disableDetail = TokenDisableDetail(TokenDisableAction.CONSUMED, Date())
+                        tokenRepository.save(token)
+                        TokenVerifyResult.SUCCESS
+                    }
                 }
             }
         }
@@ -142,5 +153,17 @@ class TokenGenerationService{
 
     fun tokenGroupSigningKeyResolverWrapper(): TokenGroupSigningKeyResolver{
         return TokenGroupSigningKeyResolver(tokenGroupRepository)
+    }
+
+    fun revokeToken(uuidStr: String): Boolean{
+        val token = tokenRepository.findByUuid(UUID.fromString(uuidStr))
+        return token?.let {
+            if (token.isActive){
+                token.isActive = false
+                token.disableDetail = TokenDisableDetail(TokenDisableAction.REVOKED, Date())
+                tokenRepository.save(token)
+            }
+            true
+        } ?: false
     }
 }
