@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.model.dao.user
 
 
+import carloschau.tokengenerator.model.dao.authentication.AuthenticationToken
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Document
@@ -11,7 +12,7 @@ enum class UserStatus{
     INACTIVE, ACTIVE, LOCKED, DELETED
 }
 
-@Document("user")
+@Document
 data class User(
         @Id val id: String? = null,
         @Indexed(unique = true) val username: String,
@@ -19,4 +20,6 @@ data class User(
         val passwordHash: String,
         val status: UserStatus,
         val createdOn : Date,
-        val roles : List<String> = listOf())
+        val roles : List<String> = listOf(),
+        var authenticationTokens : List<AuthenticationToken> = listOf()
+)
