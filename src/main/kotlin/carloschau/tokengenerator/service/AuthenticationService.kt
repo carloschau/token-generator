@@ -26,7 +26,6 @@ class AuthenticationService {
         val accessToken = UUID.randomUUID()
 
         val authenticationToken = AuthenticationToken(
-                //userId = user.id!!,
                 issueAt = Date(),
                 expiration = expiration,
                 accessToken = accessToken,
