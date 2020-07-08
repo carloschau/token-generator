@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException
 import javax.validation.Valid
 
 @RestController
+@RequestMapping("/token")
 class TokenController {
     val logger: Logger = LoggerFactory.getLogger(javaClass)
 
@@ -34,7 +35,7 @@ class TokenController {
     @Autowired
     private lateinit var tokenGroupService : TokenGroupService
 
-    @GetMapping("/token/{uuid}")
+    @GetMapping("/{uuid}")
     fun token(
             @PathVariable uuid: String,
             @RequestParam requestParam: Map<String, String>
@@ -77,7 +78,7 @@ class TokenController {
                 .map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
 
-    @PostMapping("/token/verify")
+    @PostMapping("/verify")
     fun verifyToken(@RequestBody @Valid request : VerifyTokenRequest) : ResponseEntity<VerifyTokenDto>
     {
         val tokenVerifyResult = tokenGenerationService.verifyToken(request.token)
@@ -88,17 +89,11 @@ class TokenController {
         return ResponseEntity(VerifyTokenDto(tokenVerifyResult.reason), responseStatus)
     }
 
-    @DeleteMapping("/token")
+    @DeleteMapping
     fun revokeToken(@RequestBody @Valid request : RevokeTokenRequest): ResponseEntity<Any>{
         return if (tokenGenerationService.revokeToken(request.uuid))
             ResponseEntity(HttpStatus.OK)
         else
             ResponseEntity(HttpStatus.BAD_REQUEST)
-    }
-
-
-    @RequestMapping("/hello")
-    fun hello(){
-
     }
 }
