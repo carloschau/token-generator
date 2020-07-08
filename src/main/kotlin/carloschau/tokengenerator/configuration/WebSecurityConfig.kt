@@ -2,21 +2,30 @@ package carloschau.tokengenerator.configuration
 
 import carloschau.tokengenerator.security.PreAuthenticationDetailsSource
 import carloschau.tokengenerator.security.TokenAuthenticationFilter
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedGrantedAuthoritiesUserDetailsService
-import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter
 
 @Configuration
 @EnableWebSecurity
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
+    @Value("\${spring.security.web.ignoring.path}")
+    lateinit var ignoringPath : Array<String>
+
+    override fun configure(web: WebSecurity?) {
+        web?.let {
+            web.ignoring().antMatchers(*ignoringPath)
+        }
+    }
 
     override fun configure(http: HttpSecurity?) {
         http?.let {
