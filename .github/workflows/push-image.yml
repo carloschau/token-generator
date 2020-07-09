@@ -21,8 +21,8 @@ jobs:
     steps:
       - name: pwd
         run: pwd
-      - name: dir
-        run: dir
+      - name: ll
+        run: ls -la
       - name: grand execute permission to gradlew
         run: chmod +x ./gradlew
       - name: push image to repo
