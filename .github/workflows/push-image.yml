@@ -19,6 +19,8 @@ jobs:
       CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
     steps:
+      - name: grand execute permission to gradlew
+        run: chmod +x ./gradlew
       - name: push image to repo
         run: ./gradlew dockerPushImage
        
