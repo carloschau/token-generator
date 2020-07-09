@@ -20,6 +20,8 @@ jobs:
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
+      - name: grant execute permission to gradlew
+        run: chmod +x ./gradlew
       - name: push image to repo
         run: ./gradlew dockerPushImage
        
