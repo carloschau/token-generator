@@ -16,8 +16,8 @@ jobs:
   push-image:
     runs-on: ubuntu-20.04
     env:
-      CONTAINER_REPO_USERNAME: ${{ secret.CONTAINER_REPO_USERNAME }}
-      CONTAINER_REPO_PASSWORD: ${{ secret.CONTAINER_REPO_PASSWORD }} 
+      CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
+      CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
     steps:
       - name: push image to repo
         run: ./gradlew dockerPushImage
