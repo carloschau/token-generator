@@ -53,7 +53,12 @@ tasks.withType<KotlinCompile> {
 }
 
 docker {
+    registryCredentials {
+        username.set(System.getenv("CONTAINER_REPO_USERNAME"))
+        password.set(System.getenv("CONTAINER_REPO_PASSWORD"))
+    }
     springBootApplication {
+        maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
     }
 }
 
