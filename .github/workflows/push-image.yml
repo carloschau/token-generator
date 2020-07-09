@@ -6,9 +6,9 @@ name: CI
 # events but only for the master branch
 on:
   push:
-    branches: [ master ]
+    branches: [ github-action-debug ]
   pull_request:
-    branches: [ master ]
+    branches: [ github-action-debug ]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -19,6 +19,10 @@ jobs:
       CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
     steps:
+      - name: pwd
+        run: pwd
+      - name: dir
+        run: dir
       - name: grand execute permission to gradlew
         run: chmod +x ./gradlew
       - name: push image to repo
