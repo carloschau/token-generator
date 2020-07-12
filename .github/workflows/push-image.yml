@@ -24,4 +24,27 @@ jobs:
         run: chmod +x ./gradlew
       - name: push image to repo
         run: ./gradlew dockerPushImage
+      # Set the target AKS cluster.
+      - uses: Azure/aks-set-context@v1
+      with:
+       creds: '${{ secrets.AZURE_CREDENTIALS }}'
+       cluster-name: contoso
+       resource-group: contoso-rg
+
+      - uses: Azure/k8s-create-secret@v1
+       with:
+         container-registry-url: contoso.azurecr.io
+         container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+         container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+         secret-name: demo-k8s-secret
+
+      - uses: Azure/k8s-deploy@v1
+       with:
+         manifests: |
+           manifests/deployment.yml
+           manifests/service.yml
+         images: |
+           demo.azurecr.io/k8sdemo:${{ github.sha }}
+         imagepullsecrets: |
+           demo-k8s-secret
        

@@ -62,6 +62,13 @@ docker {
     }
 }
 
+tasks.register("getProperty"){
+    doLast{
+        if (project.hasProperty("propertyName"))
+            println(project.findProperty(project.findProperty("propertyName").toString()).toString())
+    }
+}
+
 fun getConfigurationProperty(envVar: String, sysProp: String): String? {
     return System.getenv(envVar) ?: project.findProperty(sysProp)?.toString()
 }
