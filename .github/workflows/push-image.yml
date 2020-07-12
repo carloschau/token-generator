@@ -28,12 +28,12 @@ jobs:
       - uses: Azure/aks-set-context@v1
         with:
          creds: '${{ secrets.AZURE_CREDENTIALS }}'
-         cluster-name: contoso
-         resource-group: contoso-rg
+         cluster-name: token-generator-akscluster
+         resource-group: token-generator-kubernetes
 
       - uses: Azure/k8s-create-secret@v1
         with:
-          container-registry-url: contoso.azurecr.io
+          container-registry-url: docker.io
           container-registry-username: ${{ secrets.CONTAINER_REPO_USERNAME }}
           container-registry-password: ${{ secrets.CONTAINER_REPO_PASSWORD }}
           secret-name: demo-k8s-secret
@@ -44,7 +44,7 @@ jobs:
             manifests/deployment.yml
             manifests/service.yml
           images: |
-            demo.azurecr.io/k8sdemo:${{ github.sha }}
+            carloschau/token-generator:0.0.1-SNAPSHOT
           imagepullsecrets: |
             demo-k8s-secret
        
