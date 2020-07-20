@@ -20,31 +20,7 @@ jobs:
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
-      - name: grant execute permission to gradlew
-        run: chmod +x ./gradlew
       - name: push image to repo
-        run: ./gradlew dockerPushImage
-      # Set the target AKS cluster.
-      - uses: Azure/aks-set-context@v1
-        with:
-         creds: '${{ secrets.AZURE_CREDENTIALS }}'
-         cluster-name: token-generator-akscluster
-         resource-group: token-generator-kubernetes
-
-      - uses: Azure/k8s-create-secret@v1
-        with:
-          container-registry-url: docker.io
-          container-registry-username: ${{ secrets.CONTAINER_REPO_USERNAME }}
-          container-registry-password: ${{ secrets.CONTAINER_REPO_PASSWORD }}
-          secret-name: demo-k8s-secret
-
-      - uses: Azure/k8s-deploy@v1
-        with:
-          manifests: |
-            manifests/deployment.yml
-            manifests/service.yml
-          images: |
-            carloschau/token-generator:0.0.1-SNAPSHOT
-          imagepullsecrets: |
-            demo-k8s-secret
-       
+        run: |
+          chmod +x ./gradlew
+          ./gradlew dockerPushImage
