@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: token-generator-deployment
+spec:
+  selector:
+    matchLabels:
+      app: token-generator
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: token-generator
+    spec:
+      containers:
+        - name: token-generator
+          image: carloschau/token-generator:0.0.1-snapshot
+          ports:
+            - containerPort: 8080
