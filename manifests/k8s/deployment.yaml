@@ -17,3 +17,5 @@ spec:
           image: carloschau/token-generator:0.0.1-snapshot
           ports:
             - containerPort: 8080
+      imagePullSecrets:
+        - name: dockerhub
