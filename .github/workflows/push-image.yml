@@ -47,6 +47,7 @@ jobs:
 
       - name: Deploy
         run: |
+          kubectl create secret docker-registry dockerhub --docker-server=docker.io --docker-username=$CONTAINER_REPO_USERNAME --docker-password=$CONTAINER_REPO_PASSWORD --docker-email=carlos.chau719@gmail.com
           kubectl apply -f manifests/k8s/deployment.yaml -f manifests/k8s/service.yaml
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
