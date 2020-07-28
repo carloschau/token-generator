@@ -6,9 +6,7 @@ name: Docker Image Deploy
 # events but only for the master branch
 on:
   push:
-    branches: [ master, github-action-debug ]
-  pull_request:
-    branches: [ master ]
+    branches: [ github-action-debug ]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -18,10 +16,6 @@ jobs:
     env:
       CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
-      PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-      GKE_CLUSTER: cluster-1
-      GKE_ZONE: us-central1-c
-      DEPLOYMENT_NAME: token-generator-deployment
     steps:
       - uses: actions/checkout@v2
 
@@ -29,25 +23,3 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew dockerPushImage
-
-      # Setup gcloud CLI
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-        with:
-          version: '290.0.1'
-          service_account_key: ${{ secrets.GKE_SA_KEY }}
-          project_id: ${{ secrets.GKE_PROJECT }}
-
-      # Configure Docker to use the gcloud command-line tool as a credential
-      # helper for authentication
-      - run: |-
-          gcloud --quiet auth configure-docker
-      # Get the GKE credentials so we can deploy to the cluster
-      - run: |-
-          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
-
-      - name: Deploy
-        run: |
-          kubectl create secret docker-registry dockerhub --docker-server=docker.io --docker-username=$CONTAINER_REPO_USERNAME --docker-password=$CONTAINER_REPO_PASSWORD --docker-email=carlos.chau719@gmail.com
-          kubectl apply -f manifests/k8s/deployment.yaml -f manifests/k8s/service.yaml
-          kubectl rollout status deployment/$DEPLOYMENT_NAME
-          kubectl get services -o wide

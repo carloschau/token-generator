@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "carloschau"
-version = "0.0.1-SNAPSHOT"
+version = getConfigurationProperty("VERSION", "version") as Any
 description = "token-generator"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
