@@ -14,9 +14,10 @@ plugins {
 }
 
 group = "carloschau"
-version = getConfigurationProperty("VERSION", "version") as Any
+version = "0.0.1-SNAPSHOT"
 description = "token-generator"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+var dockerImageTag = getConfigurationProperty("DOCKER_IMAGE_TAG", "dockerImageTag")
 
 repositories {
     mavenCentral()
@@ -59,6 +60,7 @@ docker {
     }
     springBootApplication {
         maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
+        images.set(setOf("${group}/${description}:${dockerImageTag}"))
     }
 }
 
