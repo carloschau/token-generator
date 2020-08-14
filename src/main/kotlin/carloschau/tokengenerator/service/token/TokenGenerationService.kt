@@ -4,23 +4,21 @@ import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
 import carloschau.tokengenerator.model.dao.token.Token
 import carloschau.tokengenerator.model.dao.token.TokenDisableAction
 import carloschau.tokengenerator.model.dao.token.TokenDisableDetail
-import carloschau.tokengenerator.model.dao.token.TokenGroup
+import carloschau.tokengenerator.model.dao.token.TokenGroupInfo
 import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.model.token.TokenVerifyResult
 import carloschau.tokengenerator.repository.token.TokenGroupRepository
 import carloschau.tokengenerator.repository.token.TokenRepository
-import carloschau.tokengenerator.util.UuidUtil
+import carloschau.tokengenerator.util.CommonUtil
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.SignatureException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
-import javax.crypto.SecretKey
 
 @Service
 class TokenGenerationService{
@@ -32,8 +30,8 @@ class TokenGenerationService{
     @Autowired
     private lateinit var tokenRepository: TokenRepository
 
-    fun generateToken(uuidStr: String, type: TokenType, media: String?, paramSource: Map<String, String>): String {
-        val uuid = UuidUtil.fromStringWithoutDash(uuidStr);
+    fun generateToken(uuidStr: String, type: TokenType, media: String?, paramSource: Map<String, String>): Token {
+        val uuid = UUID.fromString(uuidStr);
         val tokenGroup = tokenGroupRepository.findByUuid(uuid)
         logger.debug("Token Group with uuid $uuid is ${tokenGroup?.id?:"Not Found"}")
 
@@ -44,30 +42,28 @@ class TokenGenerationService{
             val token = Token().apply {
                 this.uuid = UUID.randomUUID()
                 this.media = media
-                this.groupId = tokenGroup.id
                 this.type = type
                 this.issueAt = Date()
                 if (group.tokenLifetime > 0)
                     this.expireAt = Date(issueAt.time + group.tokenLifetime * 1000)
-            }
-
-            val resultToken = generateJwtByToken(token, group.signingKey!!).let {jwt ->
-                if (!group.pattern.isNullOrBlank())
-                    massageWithPattern(group, jwt, paramSource)
-                else
-                    jwt
+                this.groupInfo = TokenGroupInfo().apply {
+                    groupId = group.id
+                    signingKey = group.signingKey
+                    pattern = group.pattern
+                }
+                meta = paramSource
             }
 
             tokenRepository.save(token)
             tokenGroupRepository.incNumberOfTokenIssued(group.id!!)
-            resultToken
+            token
         } ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Token group not found with uuid")
     }
 
-    fun generateJwtByToken(token: Token, signingKey: SecretKey): String{
+    fun tokenToJwt(token: Token): String{
         return Jwts.builder()
                 .setHeaderParam(JwsHeader.TYPE, JwsHeader.JWT_TYPE)
-                .setHeaderParam(JwsHeader.KEY_ID, token.groupId)
+                .setHeaderParam(JwsHeader.KEY_ID, token.groupInfo.groupId)
                 .setIssuedAt(token.issueAt)
                 .setId(token.uuid.toString())
                 .run {
@@ -76,12 +72,17 @@ class TokenGenerationService{
                     else
                         this
                 }
-                .signWith(signingKey)
+                .signWith(token.groupInfo.signingKey)
                 .compact()
+                .let {
+                    if (!token.groupInfo.pattern.isNullOrBlank())
+                        massageWithPattern(it, token.groupInfo.pattern!!, token.meta)
+                    else it
+                }
     }
 
-    private fun massageWithPattern(tokenGroup: TokenGroup, token: String, paramSource: Map<String, String>): String{
-        val patternParams = tokenGroup.patternParameters
+    private fun massageWithPattern(token: String, pattern: String, paramSource: Map<String, String>): String{
+        val patternParams = CommonUtil.tokenizeString(pattern)
         if (!patternParams.contains(TokenPatternPlaceholder.EMPTY) && !patternParams.contains(TokenPatternPlaceholder.TOKEN))
         {
             "Invalid token pattern! token placeholder({} or {token}) not found".also(logger::error).also {
@@ -89,7 +90,7 @@ class TokenGenerationService{
             }
         }
 
-        var result = tokenGroup.pattern!!
+        var result = pattern
         patternParams.forEach {
             result = when(it){
                 TokenPatternPlaceholder.EMPTY -> {
@@ -103,7 +104,7 @@ class TokenGenerationService{
                 TokenPatternPlaceholder.TOKEN ->
                     result.replace("{$it}", token)
                 else ->
-                    result.replace("{$it}",paramSource.getValue(it))
+                    result.replace("{$it}",paramSource[it] ?: "")
             }
         }
         return result
@@ -165,5 +166,9 @@ class TokenGenerationService{
             }
             true
         } ?: false
+    }
+
+    fun getTokenByUuid(uuidStr: String): Token? {
+        return tokenRepository.findByUuid(UUID.fromString(uuidStr))
     }
 }

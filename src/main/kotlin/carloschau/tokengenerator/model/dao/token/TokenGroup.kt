@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.model.dao.token
 
 import carloschau.tokengenerator.constant.token.TokenPatternPlaceholder
+import carloschau.tokengenerator.util.CommonUtil
 import io.jsonwebtoken.security.Keys
 import org.bson.types.Binary
 import org.springframework.data.annotation.Id
@@ -64,7 +65,7 @@ class TokenGroup
             return false
         else
         {
-            val params = patternParameters
+            val params = pattern!!.let(CommonUtil::tokenizeString)
             if (params.isEmpty())
                 return false
 
@@ -80,11 +81,7 @@ class TokenGroup
         }
     }
 
-    val patternParameters : Set<String> get() {
-        return "\\{.*?}".toRegex().findAll(pattern!!).map {
-            it.value.trimStart('{').trimEnd('}')
-        }.toSet()
-    }
+
 }
 
 enum class TokenGroupStatus(val reason: String = ""){
