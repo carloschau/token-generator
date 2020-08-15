@@ -68,8 +68,7 @@ class TokenController {
     @PostMapping
     //TODO: add API key for domain restriction
     fun createToken(@RequestBody @Valid request : CreateToken,
-                    @RequestParam requestParam: Map<String, String>,
-                    @RequestHeader("Idempotent-Key") idempotentKey: String? ): RedirectView{
+                    @RequestParam requestParam: Map<String, String>): RedirectView{
         logger.info("Generating token.... uuid:${request.tokenGroupUuid}, type: ${request.type}, media: ${request.media}")
         val tokenType = request.type.let{
             TokenType.fromValue(it ?: TokenType.QR_CODE.value) ?:
