@@ -20,6 +20,6 @@ data class User(
         val passwordHash: String,
         val status: UserStatus,
         val createdOn : Date,
-        val roles : List<String> = listOf(),
+        val roles : List<RoleAuthority> = listOf(),
         var authenticationTokens : List<AuthenticationToken> = listOf()
 )

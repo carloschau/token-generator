@@ -1,5 +1,6 @@
 package carloschau.tokengenerator.service
 
+import carloschau.tokengenerator.model.dao.user.RoleAuthority
 import carloschau.tokengenerator.model.dao.user.User
 import carloschau.tokengenerator.model.dao.user.UserStatus
 import carloschau.tokengenerator.repository.user.UserRepository
@@ -44,6 +45,10 @@ class  UserService{
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
 
         return if (user != null && argon2.verify(user.passwordHash, password)) user else null
+    }
+
+    fun addRoleAuthority(userId: String, role: RoleAuthority){
+        userRepository.pushRoleAuthority(userId, role)
     }
 
 }
