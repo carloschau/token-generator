@@ -7,6 +7,7 @@ import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenProjectService
 import carloschau.tokengenerator.service.UserService
 import org.springframework.security.access.annotation.Secured
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
@@ -37,7 +38,7 @@ class ProjectController {
     }
 
     @DeleteMapping("/{projectName}")
-    @Secured
+    @PreAuthorize("hasAnyAuthority([#projectName'/Owner'])")
     fun deleteProject(@PathVariable("projectName") projectName: String){
 
     }
