@@ -1,12 +1,11 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.model.dao.project.role.Role
-import carloschau.tokengenerator.model.dao.user.RoleAuthority
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenProjectService
 import carloschau.tokengenerator.service.UserService
-import org.springframework.security.access.annotation.Secured
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.query.Param
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
@@ -15,7 +14,11 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/project")
 class ProjectController {
+
+    @Autowired
     lateinit var tokenProjectService: TokenProjectService
+
+    @Autowired
     lateinit var userService: UserService
 
     @PostMapping
@@ -28,18 +31,20 @@ class ProjectController {
     }
 
     @PutMapping("/{projectName}")
-    fun updateProject(){
+    @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
+    fun updateProject(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @GetMapping("/{projectName}")
-    fun getProject(){
+    @PreAuthorize("isProjectMember(#projectName)")
+    fun getProject(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @DeleteMapping("/{projectName}")
-    @PreAuthorize("hasAnyAuthority([#projectName'/Owner'])")
-    fun deleteProject(@PathVariable("projectName") projectName: String){
+    @PreAuthorize("isProjectOwner(#projectName)")
+    fun deleteProject(@PathVariable @Param("projectName") projectName: String){
 
     }
 

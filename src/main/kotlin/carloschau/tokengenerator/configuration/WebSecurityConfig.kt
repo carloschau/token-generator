@@ -17,7 +17,6 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedG
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
 class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Value("\${spring.security.web.ignoring.path}")
