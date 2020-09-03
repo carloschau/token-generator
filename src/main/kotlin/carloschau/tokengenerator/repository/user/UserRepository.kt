@@ -6,6 +6,7 @@ import carloschau.tokengenerator.model.dao.user.User
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria.where
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Query.query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.data.mongodb.repository.MongoRepository
@@ -23,6 +24,7 @@ interface UserRepositoryCustom {
     fun pushAuthenticationToken(userId: String, authenticationToken: AuthenticationToken)
     fun pushRoleAuthority(userId: String, role: RoleAuthority)
     fun updateRoleAuthorityByDirectory(userId: String, role: RoleAuthority)
+    fun pullRoleAuthorityByDirectory(directory: String)
 }
 
 class UserRepositoryCustomImpl:  UserRepositoryCustom{
@@ -45,5 +47,11 @@ class UserRepositoryCustomImpl:  UserRepositoryCustom{
         val query = query(where("id").`is`(userId).and("roles.directory").`is`(role.directory))
         val update = Update().set("roles.$.role", role.role)
         mongoTemplate.updateFirst(query, update, User::class.java)
+    }
+
+    override fun pullRoleAuthorityByDirectory(directory: String){
+        val query = query(where("directory").`is`(directory))
+        val update = Update().pull("roles",query)
+        mongoTemplate.updateMulti(Query(), update, User::class.java)
     }
 }

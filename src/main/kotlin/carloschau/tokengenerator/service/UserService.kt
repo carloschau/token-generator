@@ -47,8 +47,4 @@ class  UserService{
         return if (user != null && argon2.verify(user.passwordHash, password)) user else null
     }
 
-    fun addRoleAuthority(userId: String, role: RoleAuthority){
-        userRepository.pushRoleAuthority(userId, role)
-    }
-
 }

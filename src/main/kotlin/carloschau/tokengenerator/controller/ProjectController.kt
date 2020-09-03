@@ -45,7 +45,9 @@ class ProjectController {
     @DeleteMapping("/{projectName}")
     @PreAuthorize("isProjectOwner(#projectName)")
     fun deleteProject(@PathVariable @Param("projectName") projectName: String){
-
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
+        tokenProjectService.removeProject(projectName)
+        authenticationDetails.roles.removeIf { role -> role.directory == projectName }
     }
 
     @GetMapping("/projects")

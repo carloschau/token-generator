@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProjectRepository : MongoRepository<Project, String>  {
+    fun deleteByName(name: String) : Long
 }
