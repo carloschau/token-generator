@@ -1,18 +1,22 @@
 package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
+import carloschau.tokengenerator.model.dto.response.project.Project
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenProjectService
 import carloschau.tokengenerator.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.query.Param
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/project")
+@RequestMapping("/projects")
 class ProjectController {
 
     @Autowired
@@ -38,8 +42,10 @@ class ProjectController {
 
     @GetMapping("/{projectName}")
     @PreAuthorize("isProjectMember(#projectName)")
-    fun getProject(@PathVariable @Param("projectName") projectName: String){
-
+    fun getProject(@PathVariable @Param("projectName") projectName: String): Project{
+        return tokenProjectService.getProjectByName(projectName)?.let {
+            Project(it.name, it.description, it.createDate)
+        } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project $projectName not exists")
     }
 
     @DeleteMapping("/{projectName}")
@@ -50,9 +56,12 @@ class ProjectController {
         authenticationDetails.roles.removeIf { role -> role.directory == projectName }
     }
 
-    @GetMapping("/projects")
-    fun getAllProjectByUser(){
-
+    @GetMapping
+    fun getAllProjectByUser(pageable: Pageable): List<Project>{
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
+        return tokenProjectService.getProjectsByUserId(authenticationDetails.userId, pageable).map {
+            Project(it.name, it.description, it.createDate)
+        }
     }
 
     @PostMapping("/{projectName}/member")

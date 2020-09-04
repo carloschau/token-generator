@@ -7,6 +7,7 @@ import carloschau.tokengenerator.model.dao.user.RoleAuthority
 import carloschau.tokengenerator.repository.project.ProjectRepository
 import carloschau.tokengenerator.repository.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -33,5 +34,13 @@ class TokenProjectService {
     fun removeProject(projectName: String){
         projectRepository.deleteByName(projectName)
         userRepository.pullRoleAuthorityByDirectory(projectName)
+    }
+
+    fun getProjectByName(projectName: String): Project?{
+        return projectRepository.findByName(projectName)
+    }
+
+    fun getProjectsByUserId(userId: String, pageable: Pageable): List<Project>{
+        return projectRepository.findAllByMember_UserId(userId, pageable)
     }
 }
