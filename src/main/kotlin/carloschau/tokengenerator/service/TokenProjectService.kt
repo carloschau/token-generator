@@ -43,4 +43,16 @@ class TokenProjectService {
     fun getProjectsByUserId(userId: String, pageable: Pageable): List<Project>{
         return projectRepository.findAllByMember_UserId(userId, pageable)
     }
+
+    fun updateProject(projectName: String, newName: String, newDescription: String){
+        projectRepository.updateByName(projectName, mapOf(
+                "name" to newName,
+                "description" to newDescription
+        ))
+
+        //Handle on project name changed
+        if (projectName != newName){
+            userRepository.updateRoleDirectory(projectName, newName)
+        }
+    }
 }

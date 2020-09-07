@@ -1,7 +1,9 @@
 package carloschau.tokengenerator.controller
 
+import carloschau.tokengenerator.model.dao.project.Project
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
-import carloschau.tokengenerator.model.dto.response.project.Project
+import carloschau.tokengenerator.model.dto.request.project.UpdateProject
+import carloschau.tokengenerator.model.dto.response.project.ProjectDto
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenProjectService
 import carloschau.tokengenerator.service.UserService
@@ -36,15 +38,18 @@ class ProjectController {
 
     @PutMapping("/{projectName}")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
-    fun updateProject(@PathVariable @Param("projectName") projectName: String){
-
+    fun updateProject(
+            @PathVariable @Param("projectName") projectName: String,
+            @RequestBody updateProject: UpdateProject
+    ){
+        tokenProjectService.updateProject(projectName, updateProject.name, updateProject.description)
     }
 
     @GetMapping("/{projectName}")
     @PreAuthorize("isProjectMember(#projectName)")
-    fun getProject(@PathVariable @Param("projectName") projectName: String): Project{
+    fun getProject(@PathVariable @Param("projectName") projectName: String): ProjectDto{
         return tokenProjectService.getProjectByName(projectName)?.let {
-            Project(it.name, it.description, it.createDate)
+            ProjectDto(it.name, it.description, it.createDate)
         } ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project $projectName not exists")
     }
 
@@ -57,40 +62,42 @@ class ProjectController {
     }
 
     @GetMapping
-    fun getAllProjectByUser(pageable: Pageable): List<Project>{
+    fun getAllProjectByUser(pageable: Pageable): List<ProjectDto>{
         val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
         return tokenProjectService.getProjectsByUserId(authenticationDetails.userId, pageable).map {
-            Project(it.name, it.description, it.createDate)
+            ProjectDto(it.name, it.description, it.createDate)
         }
     }
 
     @PostMapping("/{projectName}/member")
-    fun addMember(){
+    @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
+    fun addMember(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @GetMapping("/{projectName}/members")
-    fun getAllProjectMembers(){
+    @PreAuthorize("isProjectMember(#projectName)")
+    fun getAllProjectMembers(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @GetMapping("/{projectName}/member/{userId}")
-    fun getProjectMember(){
+    fun getProjectMember(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @PutMapping("/{projectName}/member")
-    fun updateMember(){
+    fun updateMember(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @DeleteMapping("/{projectName}/member")
-    fun removeMember(){
+    fun removeMember(@PathVariable @Param("projectName") projectName: String){
 
     }
 
     @GetMapping("/{projectName}/token")
-    fun getAllToken(){
+    fun getAllToken(@PathVariable @Param("projectName") projectName: String){
 
     }
 }
