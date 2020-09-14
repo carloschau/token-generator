@@ -1,6 +1,7 @@
 package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.model.dao.project.Project
+import carloschau.tokengenerator.model.dto.request.project.AddMember
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
 import carloschau.tokengenerator.model.dto.request.project.UpdateProject
 import carloschau.tokengenerator.model.dto.response.project.ProjectDto
@@ -71,7 +72,7 @@ class ProjectController {
 
     @PostMapping("/{projectName}/member")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
-    fun addMember(@PathVariable @Param("projectName") projectName: String){
+    fun addMember(@PathVariable @Param("projectName") projectName: String, addMember: AddMember){
 
     }
 

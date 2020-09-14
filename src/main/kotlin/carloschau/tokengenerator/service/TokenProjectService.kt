@@ -9,6 +9,7 @@ import carloschau.tokengenerator.repository.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
@@ -19,6 +20,7 @@ class TokenProjectService {
     @Autowired
     private lateinit var userRepository: UserRepository
 
+    @Transactional
     fun createProject(projectName: String, description: String, ownerUserId: String): RoleAuthority{
         projectRepository.insert(Project(
                 name = projectName,
@@ -31,6 +33,7 @@ class TokenProjectService {
         return newRole
     }
 
+    @Transactional
     fun removeProject(projectName: String){
         projectRepository.deleteByName(projectName)
         userRepository.pullRoleAuthorityByDirectory(projectName)
@@ -44,6 +47,7 @@ class TokenProjectService {
         return projectRepository.findAllByMember_UserId(userId, pageable)
     }
 
+    @Transactional
     fun updateProject(projectName: String, newName: String, newDescription: String){
         projectRepository.updateByName(projectName, mapOf(
                 "name" to newName,
@@ -54,5 +58,9 @@ class TokenProjectService {
         if (projectName != newName){
             userRepository.updateRoleDirectory(projectName, newName)
         }
+    }
+
+    fun addMemberToProject(projectName: String, userId: String, role: Role){
+        userRepository.pushRoleAuthority(userId, RoleAuthority(projectName, role.name))
     }
 }

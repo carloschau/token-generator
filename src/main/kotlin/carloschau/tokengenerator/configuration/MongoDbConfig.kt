@@ -8,7 +8,10 @@ import org.bson.codecs.UuidCodec
 import org.bson.codecs.configuration.CodecRegistries
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.mongodb.MongoDbFactory
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration
 
 
@@ -31,5 +34,10 @@ class MongoDbConfig: AbstractMongoConfiguration() {
 
     override fun getDatabaseName(): String {
         return database
+    }
+
+    @Bean
+    fun transactionManager(dbFactory: MongoDbFactory) : MongoTransactionManager{
+        return MongoTransactionManager(dbFactory)
     }
 }
