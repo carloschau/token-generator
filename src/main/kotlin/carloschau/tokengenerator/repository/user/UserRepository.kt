@@ -25,9 +25,10 @@ interface UserRepository : MongoRepository<User, String>, UserRepositoryCustom {
 interface UserRepositoryCustom {
     fun pushAuthenticationToken(userId: String, authenticationToken: AuthenticationToken)
     fun pushRoleAuthority(userId: String, role: RoleAuthority)
+    fun pullRoleAuthority(userId: String, directory: String)
     fun pullRoleAuthorityByDirectory(directory: String)
     fun updateRoleAuthorityByDirectory(userId: String, role: RoleAuthority)
-    fun updateRoleDirectory(oldDirectory: String, newDirectory: String)
+    fun updateRoleAuthorityDirectory(oldDirectory: String, newDirectory: String)
 }
 
 class UserRepositoryCustomImpl:  UserRepositoryCustom{
@@ -46,6 +47,12 @@ class UserRepositoryCustomImpl:  UserRepositoryCustom{
         mongoTemplate.updateFirst(query, update, User::class.java)
     }
 
+    override fun pullRoleAuthority(userId: String, directory: String) {
+        val query = query(where("id").`is`(userId).and("roles.directory").`is`(directory))
+        val update = Update().pull("roles", query)
+        mongoTemplate.updateFirst(Query(), update, User::class.java)
+    }
+
     override fun pullRoleAuthorityByDirectory(directory: String){
         val query = query(where("directory").`is`(directory))
         val update = Update().pull("roles",query)
@@ -58,9 +65,11 @@ class UserRepositoryCustomImpl:  UserRepositoryCustom{
         mongoTemplate.updateFirst(query, update, User::class.java)
     }
 
-    override fun updateRoleDirectory(oldDirectory: String, newDirectory: String){
+    override fun updateRoleAuthorityDirectory(oldDirectory: String, newDirectory: String){
         val query = query(where("roles.directory").`is`(oldDirectory))
         val update = Update().set("roles.$.directory", newDirectory)
         mongoTemplate.updateFirst(query, update, User::class.java)
     }
+
+
 }

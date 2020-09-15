@@ -57,7 +57,7 @@ class TokenProjectService {
 
         //Handle on project name changed
         if (projectName != newName){
-            userRepository.updateRoleDirectory(projectName, newName)
+            userRepository.updateRoleAuthorityDirectory(projectName, newName)
         }
     }
 
@@ -73,5 +73,19 @@ class TokenProjectService {
 
     fun isProjectExists(projectName: String) : Boolean{
         return projectRepository.existsByName(projectName)
+    }
+
+    @Transactional
+    fun updateProjectOwnerShip(projectName: String, oldOwnerId: String, newOwnerId: String){
+        userRepository.updateRoleAuthorityByDirectory(oldOwnerId, RoleAuthority(projectName, Role.Admin.name))
+        userRepository.updateRoleAuthorityByDirectory(newOwnerId, RoleAuthority(projectName, Role.Owner.name))
+    }
+
+    fun updateMemberRole(projectName: String, userId: String, role: Role) {
+        userRepository.updateRoleAuthorityByDirectory(userId, RoleAuthority(projectName, role.name))
+    }
+
+    fun removeMemberFromProject(projectName: String, userId: String) {
+        userRepository.pullRoleAuthority(userId, projectName)
     }
 }

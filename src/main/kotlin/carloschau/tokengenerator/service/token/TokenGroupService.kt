@@ -47,4 +47,8 @@ class TokenGroupService {
     fun findAllTokenGroup() : List<TokenGroup>{
         return tokenGroupRepository.findAll().filterNotNull()
     }
+
+    fun findAllTokenGroupByProject(projectId: String): List<TokenGroup>{
+        return tokenGroupRepository.findAllByProjectId(projectId)
+    }
 }

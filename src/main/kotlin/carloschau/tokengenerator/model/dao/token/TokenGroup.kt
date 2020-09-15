@@ -12,7 +12,7 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Document
-class TokenGroup
+class TokenGroup()
 {
     @Id
     var id: String? = null
@@ -26,6 +26,7 @@ class TokenGroup
     var tokenLifetime : Int = 0
     var isActive : Boolean = true
     var pattern : String? = null
+
 
     @Transient
     var signingKey: SecretKey? = null

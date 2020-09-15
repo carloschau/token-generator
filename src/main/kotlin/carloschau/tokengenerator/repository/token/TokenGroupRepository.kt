@@ -10,10 +10,9 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import java.util.*
 
 interface TokenGroupRepository : MongoRepository<TokenGroup, String>, TokenGroupRepositoryCustom {
-
     fun findByUuid(uuid: UUID) : TokenGroup?
     fun findByOwnerId(ownerId: String): List<TokenGroup>
-
+    fun findAllByProjectId(projectId: String) : List<TokenGroup>
 }
 
 interface TokenGroupRepositoryCustom{
