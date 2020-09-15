@@ -124,6 +124,22 @@ class ProjectController {
         tokenProjectService.updateProjectOwnerShip(projectName, authenticationDetails.userId, userId)
     }
 
+    private fun updateMember(projectName: String, userId: String, role: Role){
+        if (!tokenProjectService.isProjectExists(projectName))
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+
+        val user = userService.findUser(userId)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
+
+        if (user.roles.none { r -> r.directory == projectName })
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a project member.")
+
+        if (user.roles.any { r -> r.directory == projectName && r.role == Role.Owner.name })
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is the project owner!")
+
+        tokenProjectService.updateMemberRole(projectName, userId, role)
+    }
+
     @PutMapping("/{projectName}/members/{userId}/admin")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
     fun updateMemberToAdmin(@PathVariable @Param("projectName") projectName: String, @PathVariable userId: String){
@@ -140,22 +156,6 @@ class ProjectController {
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
     fun updateMemberToReviewer(@PathVariable @Param("projectName") projectName: String, @PathVariable userId: String){
         updateMember(projectName, userId, Role.Reviewer)
-    }
-
-    private fun updateMember(projectName: String, userId: String, role: Role){
-        if (!tokenProjectService.isProjectExists(projectName))
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
-
-        val user = userService.findUser(userId)
-                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
-
-        if (user.roles.none { r -> r.directory == projectName })
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a project member.")
-
-        if (user.roles.any { r -> r.directory == projectName && r.role == Role.Owner.name })
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is the project owner!")
-
-        tokenProjectService.updateMemberRole(projectName, userId, role)
     }
 
     @DeleteMapping("/{projectName}/members/{userId}")

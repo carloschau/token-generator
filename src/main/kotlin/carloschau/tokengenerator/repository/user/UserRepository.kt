@@ -48,9 +48,9 @@ class UserRepositoryCustomImpl:  UserRepositoryCustom{
     }
 
     override fun pullRoleAuthority(userId: String, directory: String) {
-        val query = query(where("id").`is`(userId).and("roles.directory").`is`(directory))
-        val update = Update().pull("roles", query)
-        mongoTemplate.updateFirst(Query(), update, User::class.java)
+        val query = query(where("id").`is`(userId))
+        val update = Update().pull("roles", query(where("directory").`is`(directory)))
+        mongoTemplate.updateFirst(query, update, User::class.java)
     }
 
     override fun pullRoleAuthorityByDirectory(directory: String){
