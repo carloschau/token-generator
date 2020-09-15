@@ -60,6 +60,7 @@ class TokenProjectService {
         }
     }
 
+    @Transactional
     fun addMemberToProject(projectName: String, userId: String, role: Role){
         userRepository.pushRoleAuthority(userId, RoleAuthority(projectName, role.name))
     }
