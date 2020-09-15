@@ -1,9 +1,9 @@
 package carloschau.tokengenerator.controller
 
-import carloschau.tokengenerator.model.dao.project.Project
 import carloschau.tokengenerator.model.dto.request.project.AddMember
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
 import carloschau.tokengenerator.model.dto.request.project.UpdateProject
+import carloschau.tokengenerator.model.dto.response.project.Member
 import carloschau.tokengenerator.model.dto.response.project.ProjectDto
 import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.TokenProjectService
@@ -70,16 +70,35 @@ class ProjectController {
         }
     }
 
-    @PostMapping("/{projectName}/member")
+    @PostMapping("/{projectName}/members")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
-    fun addMember(@PathVariable @Param("projectName") projectName: String, addMember: AddMember){
+    fun addMember(@PathVariable @Param("projectName") projectName: String, @RequestBody @Valid addMember: AddMember){
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
+        val user = userService.findUser(addMember.userId)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
+
+        if (user.roles.any { r -> r.directory == projectName })
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already a member.")
+
+        tokenProjectService.addMemberToProject(projectName, addMember.userId, addMember.role)
     }
 
     @GetMapping("/{projectName}/members")
     @PreAuthorize("isProjectMember(#projectName)")
-    fun getAllProjectMembers(@PathVariable @Param("projectName") projectName: String){
+    fun getAllProjectMembers(@PathVariable @Param("projectName") projectName: String, pageable: Pageable) : List<Member>{
+        if (!tokenProjectService.isProjectExists(projectName))
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
+        return tokenProjectService.getAllProjectMember(projectName, pageable).map {
+            Member(
+                    it.id!!,
+                    it.username,
+                    it.email,
+                    it.roles.first { r -> r.directory == projectName }.role
+            )
+        }
     }
 
     @GetMapping("/{projectName}/member/{userId}")

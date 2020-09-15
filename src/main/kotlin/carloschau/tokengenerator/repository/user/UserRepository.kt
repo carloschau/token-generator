@@ -4,6 +4,7 @@ import carloschau.tokengenerator.model.dao.authentication.AuthenticationToken
 import carloschau.tokengenerator.model.dao.user.RoleAuthority
 import carloschau.tokengenerator.model.dao.user.User
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.query.Criteria.where
 import org.springframework.data.mongodb.core.query.Query
@@ -18,6 +19,7 @@ interface UserRepository : MongoRepository<User, String>, UserRepositoryCustom {
     fun findByEmail(email : String) : User?
     fun findByUsername(username : String) : User?
     fun findByAuthenticationTokensAccessToken(accessToken: UUID) : User?
+    fun findAllByRoles_Directory(directory: String, pageable: Pageable) : List<User>
 }
 
 interface UserRepositoryCustom {

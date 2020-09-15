@@ -7,6 +7,7 @@ import carloschau.tokengenerator.repository.user.UserRepository
 import de.mkammerer.argon2.Argon2Factory
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -45,6 +46,10 @@ class  UserService{
         val argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id)
 
         return if (user != null && argon2.verify(user.passwordHash, password)) user else null
+    }
+
+    fun findUser(userId: String) : User? {
+        return userRepository.findByIdOrNull(userId)
     }
 
 }

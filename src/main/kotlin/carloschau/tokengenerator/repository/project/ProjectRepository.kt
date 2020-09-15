@@ -16,6 +16,7 @@ interface ProjectRepository : MongoRepository<Project, String>, ProjectRepositor
     fun deleteByName(name: String) : Long
     fun findByName(name: String): Project?
     fun findAllByMember_UserId(userId: String, pageable: Pageable): List<Project>
+    fun existsByName(name: String) : Boolean
 }
 
 interface ProjectRepositoryCustom {

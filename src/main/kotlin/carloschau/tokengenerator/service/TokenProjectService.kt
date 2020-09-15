@@ -4,6 +4,7 @@ import carloschau.tokengenerator.model.dao.project.Member
 import carloschau.tokengenerator.model.dao.project.Project
 import carloschau.tokengenerator.model.dao.project.role.Role
 import carloschau.tokengenerator.model.dao.user.RoleAuthority
+import carloschau.tokengenerator.model.dao.user.User
 import carloschau.tokengenerator.repository.project.ProjectRepository
 import carloschau.tokengenerator.repository.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -62,6 +63,15 @@ class TokenProjectService {
 
     @Transactional
     fun addMemberToProject(projectName: String, userId: String, role: Role){
+        projectRepository.pushMember(projectName, Member(userId, role))
         userRepository.pushRoleAuthority(userId, RoleAuthority(projectName, role.name))
+    }
+
+    fun getAllProjectMember(projectName: String, pageable: Pageable) : List<User> {
+        return userRepository.findAllByRoles_Directory(projectName, pageable)
+    }
+
+    fun isProjectExists(projectName: String) : Boolean{
+        return projectRepository.existsByName(projectName)
     }
 }
