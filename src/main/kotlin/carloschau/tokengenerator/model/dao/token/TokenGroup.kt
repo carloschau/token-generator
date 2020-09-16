@@ -12,22 +12,23 @@ import java.util.*
 import javax.crypto.SecretKey
 
 @Document
-class TokenGroup
+class TokenGroup(
+        var name: String,
+        var ownerId: String,
+        var maxTokenIssuance: Int,
+        var effectiveFrom: Date?,
+        var effectiveTo : Date?,
+        var uuid: UUID?,
+        var pattern : String?,
+        var projectId : String
+)
 {
     @Id
     var id: String? = null
-    var name: String = ""
-    var ownerId: String? = null
-    var numberOfTokenIssued: Int = 0
-    var maxTokenIssuance: Int = 0
-    var effectiveFrom: Date? = null
-    var effectiveTo : Date? = null
-    var uuid: UUID? = null
-    var tokenLifetime : Int = 0
-    var isActive : Boolean = true
-    var pattern : String? = null
-    var projectId : String? = null
 
+    var isActive : Boolean = true
+    var numberOfTokenIssued: Int = 0
+    var tokenLifetime : Int = 0
 
     @Transient
     var signingKey: SecretKey? = null

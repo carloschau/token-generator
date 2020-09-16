@@ -21,15 +21,17 @@ class TokenGroupService {
     private lateinit var tokenGroupRepository: TokenGroupRepository
 
     fun createTokenGroup(createTokenGroup : CreateTokenGroup, userId: String): String{
-        val tokenGroup = TokenGroup().apply {
-            this.name = createTokenGroup.name
-            this.uuid = UUID.randomUUID()
-            this.signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
-            this.ownerId = userId
-            this.effectiveFrom = createTokenGroup.effectiveFrom
-            this.effectiveTo = createTokenGroup.effectiveTo
-            this.maxTokenIssuance = createTokenGroup.maxTokenIssuance
-            this.pattern = createTokenGroup.pattern
+        val tokenGroup = TokenGroup(
+            name = createTokenGroup.name,
+            uuid = UUID.randomUUID(),
+            ownerId = userId,
+            effectiveFrom = createTokenGroup.effectiveFrom,
+            effectiveTo = createTokenGroup.effectiveTo,
+            maxTokenIssuance = createTokenGroup.maxTokenIssuance,
+            pattern = createTokenGroup.pattern,
+            projectId = ""
+        ).apply {
+            signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
         }
 
         if (!tokenGroup.pattern.isNullOrEmpty() && !tokenGroup.validatePattern())
