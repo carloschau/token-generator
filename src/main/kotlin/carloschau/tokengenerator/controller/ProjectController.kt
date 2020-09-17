@@ -4,6 +4,7 @@ import carloschau.tokengenerator.model.dao.project.role.Role
 import carloschau.tokengenerator.model.dto.request.project.AddMember
 import carloschau.tokengenerator.model.dto.request.project.CreateProject
 import carloschau.tokengenerator.model.dto.request.project.UpdateProject
+import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.dto.response.project.Member
 import carloschau.tokengenerator.model.dto.response.project.ProjectDto
 import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
@@ -171,5 +172,16 @@ class ProjectController {
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
         return tokenGroupService.findAllTokenGroupByProject(project.id!!).map { TokenGroupDto(it) }
+    }
+
+    @PostMapping("/{projectName}/groups")
+    @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
+    fun createTokenGroup(@PathVariable @Param("projectName") projectName: String, @RequestBody @Valid request : CreateTokenGroup): String
+    {
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+
+        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
+        return tokenGroupService.createTokenGroup(request, project.id!!, authenticationDetails.userId)
     }
 }

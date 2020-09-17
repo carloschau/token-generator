@@ -2,14 +2,11 @@ package carloschau.tokengenerator.controller
 
 import carloschau.tokengenerator.constant.token.TokenParameter
 import carloschau.tokengenerator.model.dto.request.token.CreateToken
-import carloschau.tokengenerator.model.dto.request.token.CreateTokenGroup
 import carloschau.tokengenerator.model.dto.request.token.RevokeTokenRequest
 import carloschau.tokengenerator.model.dto.request.token.VerifyTokenRequest
-import carloschau.tokengenerator.model.dto.response.token.TokenGroupDto
 import carloschau.tokengenerator.model.dto.response.token.VerifyTokenDto
 import carloschau.tokengenerator.model.token.TokenType
 import carloschau.tokengenerator.model.token.TokenVerifyResult
-import carloschau.tokengenerator.security.AuthenticationDetails
 import carloschau.tokengenerator.service.token.TokenGenerationService
 import carloschau.tokengenerator.service.token.TokenGroupService
 import carloschau.tokengenerator.util.QRCodeUtil
@@ -20,10 +17,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.view.RedirectView
 import javax.validation.Valid
 
@@ -76,21 +71,6 @@ class TokenController {
         }
         val token = tokenGenerationService.generateToken(request.tokenGroupUuid, tokenType, request.media, requestParam)
         return RedirectView("token/${token.uuid}")
-    }
-
-    @PostMapping("/tokengroup")
-    fun createTokenGroup(@RequestBody @Valid request : CreateTokenGroup): String
-    {
-        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-        return tokenGroupService.createTokenGroup(request, authenticationDetails.userId)
-    }
-
-    @GetMapping("/tokengroup")
-    fun getAllTokenGroups() : List<TokenGroupDto>
-    {
-        val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-        return tokenGroupService.findTokenGroupsByOwner(authenticationDetails.userId)
-                .map { tokenGroup -> TokenGroupDto(tokenGroup) }
     }
 
     @PostMapping("/verify")

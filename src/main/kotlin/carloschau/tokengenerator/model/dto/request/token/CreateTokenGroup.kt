@@ -11,6 +11,5 @@ data class  CreateTokenGroup(
         val effectiveTo: Date? = null,
         val maxTokenIssuance: Int = 0,
         val tokenLifetime: Int = 0,
-        val pattern: String? = null,
-        val projectId: String
+        val pattern: String? = null
 )

@@ -20,7 +20,7 @@ class TokenGroupService {
     @Autowired
     private lateinit var tokenGroupRepository: TokenGroupRepository
 
-    fun createTokenGroup(createTokenGroup : CreateTokenGroup, userId: String): String{
+    fun createTokenGroup(createTokenGroup : CreateTokenGroup, projectId: String, userId: String): String{
         val tokenGroup = TokenGroup(
             name = createTokenGroup.name,
             uuid = UUID.randomUUID(),
@@ -29,13 +29,13 @@ class TokenGroupService {
             effectiveTo = createTokenGroup.effectiveTo,
             maxTokenIssuance = createTokenGroup.maxTokenIssuance,
             pattern = createTokenGroup.pattern,
-            projectId = ""
+            projectId = projectId
         ).apply {
             signingKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
         }
 
         if (!tokenGroup.pattern.isNullOrEmpty() && !tokenGroup.validatePattern())
-            throw ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Token pattern is not empty but not valid")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Token pattern is not empty but not valid")
 
         logger.info("Token group uuid created: ${ tokenGroup.uuid }")
         tokenGroupRepository.save(tokenGroup)
