@@ -80,8 +80,8 @@ class ProjectController {
     @PostMapping("/{projectName}/members")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
     fun addMember(@PathVariable @Param("projectName") projectName: String, @RequestBody @Valid addMember: AddMember){
-        if(!tokenProjectService.isProjectExists(projectName))
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
         val user = userService.findUser(addMember.userId)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
@@ -89,16 +89,16 @@ class ProjectController {
         if (user.roles.any { r -> r.directory == projectName })
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is already a member.")
 
-        tokenProjectService.addMemberToProject(projectName, addMember.userId, addMember.role)
+        tokenProjectService.addMemberToProject(project.id!!, addMember.userId, addMember.role)
     }
 
     @GetMapping("/{projectName}/members")
     @PreAuthorize("isProjectMember(#projectName)")
     fun getAllProjectMembers(@PathVariable @Param("projectName") projectName: String, pageable: Pageable) : List<Member>{
-        if (!tokenProjectService.isProjectExists(projectName))
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
-        return tokenProjectService.getAllProjectMember(projectName, pageable).map {
+        return tokenProjectService.getAllProjectMember(project.id!!, pageable).map {
             Member(
                     it.id!!,
                     it.username,
@@ -112,8 +112,8 @@ class ProjectController {
     @PutMapping("/{projectName}/members/{userId}/owner")
     @PreAuthorize("isProjectOwner(#projectName)")
     fun updateMemberToOwner(@PathVariable @Param("projectName") projectName: String, @PathVariable userId: String){
-        if (!tokenProjectService.isProjectExists(projectName))
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
         val user = userService.findUser(userId)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
@@ -122,12 +122,12 @@ class ProjectController {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is not a member.")
 
         val authenticationDetails = SecurityContextHolder.getContext().authentication.details as AuthenticationDetails
-        tokenProjectService.updateProjectOwnerShip(projectName, authenticationDetails.userId, userId)
+        tokenProjectService.updateProjectOwnerShip(project.id!!, authenticationDetails.userId, userId)
     }
 
     private fun updateMember(projectName: String, userId: String, role: Role){
-        if (!tokenProjectService.isProjectExists(projectName))
-            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
 
         val user = userService.findUser(userId)
                 ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
@@ -138,7 +138,7 @@ class ProjectController {
         if (user.roles.any { r -> r.directory == projectName && r.role == Role.Owner.name })
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User is the project owner!")
 
-        tokenProjectService.updateMemberRole(projectName, userId, role)
+        tokenProjectService.updateMemberRole(project.id!!, userId, role)
     }
 
     @PutMapping("/{projectName}/members/{userId}/admin")
@@ -162,7 +162,11 @@ class ProjectController {
     @DeleteMapping("/{projectName}/members/{userId}")
     @PreAuthorize("isProjectOwner(#projectName) || isProjectAdmin(#projectName)")
     fun removeMember(@PathVariable @Param("projectName") projectName: String, @PathVariable userId: String){
-        tokenProjectService.removeMemberFromProject(projectName, userId)
+        val project = tokenProjectService.getProjectByName(projectName)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found.")
+        val user = userService.findUser(userId)
+                ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found.")
+        tokenProjectService.removeMemberFromProject(project.id!!, userId)
     }
 
     @GetMapping("/{projectName}/groups")

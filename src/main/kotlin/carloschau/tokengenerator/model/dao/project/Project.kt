@@ -10,6 +10,5 @@ data class Project(
         @Id val id: String? = null,
         @Indexed(unique = true) var name: String,
         var description: String,
-        var createDate: Date,
-        var member: List<Member>
+        var createDate: Date
 )

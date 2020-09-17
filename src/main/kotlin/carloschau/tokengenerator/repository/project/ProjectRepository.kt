@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository
 interface ProjectRepository : MongoRepository<Project, String>, ProjectRepositoryCustom {
     fun deleteByName(name: String) : Long
     fun findByName(name: String): Project?
-    fun findAllByMember_UserId(userId: String, pageable: Pageable): List<Project>
     fun existsByName(name: String) : Boolean
+    fun findByIdIn(ids: List<String>, pageable: Pageable) : List<Project>
 }
 
 interface ProjectRepositoryCustom {

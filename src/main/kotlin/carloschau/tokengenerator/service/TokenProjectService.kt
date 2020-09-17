@@ -1,6 +1,5 @@
 package carloschau.tokengenerator.service
 
-import carloschau.tokengenerator.model.dao.project.Member
 import carloschau.tokengenerator.model.dao.project.Project
 import carloschau.tokengenerator.model.dao.project.role.Role
 import carloschau.tokengenerator.model.dao.user.RoleAuthority
@@ -9,6 +8,7 @@ import carloschau.tokengenerator.repository.project.ProjectRepository
 import carloschau.tokengenerator.repository.user.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
@@ -23,21 +23,22 @@ class TokenProjectService {
 
     @Transactional
     fun createProject(projectName: String, description: String, ownerUserId: String): RoleAuthority{
-        projectRepository.insert(Project(
+        val project = projectRepository.insert(Project(
                 name = projectName,
                 description = description,
-                member = listOf(Member(ownerUserId, Role.Owner)),
                 createDate = Date()
         ))
-        val newRole = RoleAuthority(projectName, Role.Owner.name)
+        val newRole = RoleAuthority(project.id!!, Role.Owner.name)
         userRepository.pushRoleAuthority(ownerUserId, newRole)
         return newRole
     }
 
     @Transactional
     fun removeProject(projectName: String){
+        getProjectByName(projectName)?.let {
+            userRepository.pullRoleAuthorityByDirectory(it.id!!)
+        }
         projectRepository.deleteByName(projectName)
-        userRepository.pullRoleAuthorityByDirectory(projectName)
     }
 
     fun getProjectByName(projectName: String): Project?{
@@ -45,30 +46,25 @@ class TokenProjectService {
     }
 
     fun getProjectsByUserId(userId: String, pageable: Pageable): List<Project>{
-        return projectRepository.findAllByMember_UserId(userId, pageable)
+        return userRepository.findByIdOrNull(userId)?.let {
+            val projectIds = it.roles.map { r -> r.directory }
+            projectRepository.findByIdIn(projectIds, pageable)
+        } ?: listOf()
     }
 
-    @Transactional
     fun updateProject(projectName: String, newName: String, newDescription: String){
         projectRepository.updateByName(projectName, mapOf(
                 "name" to newName,
                 "description" to newDescription
         ))
-
-        //Handle on project name changed
-        if (projectName != newName){
-            userRepository.updateRoleAuthorityDirectory(projectName, newName)
-        }
     }
 
-    @Transactional
-    fun addMemberToProject(projectName: String, userId: String, role: Role){
-        projectRepository.pushMember(projectName, Member(userId, role))
-        userRepository.pushRoleAuthority(userId, RoleAuthority(projectName, role.name))
+    fun addMemberToProject(projectId: String, userId: String, role: Role){
+        userRepository.pushRoleAuthority(userId, RoleAuthority(projectId, role.name))
     }
 
-    fun getAllProjectMember(projectName: String, pageable: Pageable) : List<User> {
-        return userRepository.findAllByRoles_Directory(projectName, pageable)
+    fun getAllProjectMember(projectId: String, pageable: Pageable) : List<User> {
+        return userRepository.findAllByRoles_Directory(projectId, pageable)
     }
 
     fun isProjectExists(projectName: String) : Boolean{
@@ -76,16 +72,16 @@ class TokenProjectService {
     }
 
     @Transactional
-    fun updateProjectOwnerShip(projectName: String, oldOwnerId: String, newOwnerId: String){
-        userRepository.updateRoleAuthorityByDirectory(oldOwnerId, RoleAuthority(projectName, Role.Admin.name))
-        userRepository.updateRoleAuthorityByDirectory(newOwnerId, RoleAuthority(projectName, Role.Owner.name))
+    fun updateProjectOwnerShip(projectId: String, oldOwnerId: String, newOwnerId: String){
+        userRepository.updateRoleAuthorityByDirectory(oldOwnerId, RoleAuthority(projectId, Role.Admin.name))
+        userRepository.updateRoleAuthorityByDirectory(newOwnerId, RoleAuthority(projectId, Role.Owner.name))
     }
 
-    fun updateMemberRole(projectName: String, userId: String, role: Role) {
-        userRepository.updateRoleAuthorityByDirectory(userId, RoleAuthority(projectName, role.name))
+    fun updateMemberRole(projectId: String, userId: String, role: Role) {
+        userRepository.updateRoleAuthorityByDirectory(userId, RoleAuthority(projectId, role.name))
     }
 
-    fun removeMemberFromProject(projectName: String, userId: String) {
-        userRepository.pullRoleAuthority(userId, projectName)
+    fun removeMemberFromProject(projectId: String, userId: String) {
+        userRepository.pullRoleAuthority(userId, projectId)
     }
 }
