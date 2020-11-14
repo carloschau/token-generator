@@ -20,4 +20,4 @@ jobs:
       - name: Build and publish image
         run: |
           chmod +x ./gradlew
-          ./gradlew dockerPushImage -PdockerImageTag=${{ github.sha }}
+          ./gradlew dockerPushImage -PdockerImageTag=latest
