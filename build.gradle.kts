@@ -55,8 +55,8 @@ tasks.withType<KotlinCompile> {
 
 docker {
     registryCredentials {
-        username.set(getConfigurationProperty("CONTAINER_REPO_USERNAME", "repoUsername"))
-        password.set(getConfigurationProperty("CONTAINER_REPO_PASSWORD", "repoPassword"))
+        username.set(System.getenv("CONTAINER_REPO_USERNAME"))
+        password.set(System.getenv("CONTAINER_REPO_PASSWORD"))
     }
     springBootApplication {
         maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
