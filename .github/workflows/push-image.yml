@@ -19,6 +19,5 @@ jobs:
 
       - name: Build and publish image
         run: |
-          docker login -u CONTAINER_REPO_USERNAME 
           chmod +x ./gradlew
-          ./gradlew dockerPushImage -PdockerImageTag=latest
+          ./gradlew dockerBuildImage -PdockerImageTag=latest
