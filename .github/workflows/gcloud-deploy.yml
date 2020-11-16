@@ -42,7 +42,8 @@ jobs:
 
       - name: Deploy
         run: |
+          cd manifests/k8s
           ./kustomize edit set image carloschau/token-generator:TAG=carloschau/token-generator:$GITHUB_SHA
-          ./kustomize build ./manifests/k8s | kubectl apply -f -
+          ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
