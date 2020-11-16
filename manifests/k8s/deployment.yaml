@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: token-generator
-          image: carloschau/token-generator:0.0.1-snapshot
+          image: carloschau/token-generator:TAG
           ports:
             - containerPort: 8080
       imagePullSecrets:
