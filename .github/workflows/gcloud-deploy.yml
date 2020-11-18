@@ -10,6 +10,11 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   push-image:
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/push-image
+
+  gcloud-deploy:
     runs-on: ubuntu-20.04
     env:
       CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
@@ -22,7 +27,7 @@ jobs:
       - uses: actions/checkout@v2
 
       # Setup gcloud CLI
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      - uses: google-github-actions/setup-gcloud@master
         with:
           version: '290.0.1'
           service_account_key: ${{ secrets.GKE_SA_KEY }}
