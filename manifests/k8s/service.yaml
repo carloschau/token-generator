@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: token-generator-service
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: token-generator
   ports:
     - protocol: TCP
-      port: 8080
+      port: 443
       targetPort: 8080
