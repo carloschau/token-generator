@@ -9,12 +9,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  push-image:
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/workflows/push-image
-
   gcloud-deploy:
     runs-on: ubuntu-20.04
     env:
