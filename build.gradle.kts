@@ -80,7 +80,6 @@ fun loadApplicationProperties() : Properties{
     file("src/main/resources/application.properties").inputStream().let {
         props.load(it)
     }
-    println(props["server.ssl.key-store"])
     return props
 }
 
@@ -118,10 +117,10 @@ open class CopyCertificate: DefaultTask(){
         println("cert Property name: $certDestProp")
         val destPath = "${appProperties[certFilePath]}"
         println("destPath: $destPath")
-//        if(!file(destPath).exists() || force){
-//            ant.withGroovyBuilder {
-//                "move"(certFilePath to destPath)
-//            }
-//        }
+        if(!file(destPath).exists() || force){
+            ant.withGroovyBuilder {
+                "move"(certFilePath to destPath)
+            }
+        }
     }
 }
