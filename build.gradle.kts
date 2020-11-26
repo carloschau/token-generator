@@ -17,6 +17,7 @@ group = "carloschau"
 version = "0.0.1-SNAPSHOT"
 description = "token-generator"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+val classpath = "src/main/resources/"
 val appProperties = loadApplicationProperties()
 
 repositories {
@@ -60,7 +61,17 @@ docker {
     }
 }
 
-tasks.register<CopyCertificate>("copyCertificate")
+tasks.register("copyCertificate") {
+    doLast {
+        val destFilepath = appProperties[project.properties["certProp"]!!]!!
+                .toString().replace("classpath:",classpath)
+        ant.withGroovyBuilder {
+            "copy"("file" to project.properties["cert"],
+                    "tofile" to destFilepath)
+        }
+    }
+
+}
 
 tasks.register("getProperty"){
     doLast{
@@ -69,15 +80,9 @@ tasks.register("getProperty"){
     }
 }
 
-tasks.register("importProps"){
-    doLast{
-
-    }
-}
-
 fun loadApplicationProperties() : Properties{
     val props = Properties()
-    file("src/main/resources/application.properties").inputStream().let {
+    file("${classpath}application.properties").inputStream().let {
         props.load(it)
     }
     return props
@@ -85,42 +90,4 @@ fun loadApplicationProperties() : Properties{
 
 fun getConfigurationProperty(envVar: String, sysProp: String): String? {
     return System.getenv(envVar) ?: project.findProperty(sysProp)?.toString()
-}
-
-open class CopyCertificate: DefaultTask(){
-    private var certFilePath: String? = null
-    private var certDestProp: String? = null
-    private  var force: Boolean = false
-
-    @Option(option = "cert", description = "Path of certificate file to be copy")
-    open fun setCertFilePath(certFilePath: String?) {
-        this.certFilePath = certFilePath
-    }
-
-    @Option(option = "certDestProperty", description = "Property name which indicates the location of the certificate")
-    open fun setCertLocationProp(certDestProp: String?){
-        this.certDestProp = certDestProp
-    }
-
-    @Option(option = "force", description = "Do force copy if destination file already exists")
-    open fun setForce(force: Boolean){
-        this.force = force
-    }
-
-
-    @TaskAction
-    fun doCopy(){
-        if (certFilePath.isNullOrBlank() ||
-                certDestProp.isNullOrBlank())
-            return
-
-        println("cert Property name: $certDestProp")
-        val destPath = "${appProperties[certFilePath]}"
-        println("destPath: $destPath")
-        if(!file(destPath).exists() || force){
-            ant.withGroovyBuilder {
-                "move"(certFilePath to destPath)
-            }
-        }
-    }
 }
