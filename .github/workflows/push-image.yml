@@ -17,6 +17,8 @@ jobs:
     env:
       CONTAINER_REPO_USERNAME: ${{ secrets.CONTAINER_REPO_USERNAME }}
       CONTAINER_REPO_PASSWORD: ${{ secrets.CONTAINER_REPO_PASSWORD }}
+      SSL_CERT: ${{ secrets.SSL_CERTIFICATE }}
+      SSL_PASSWORD: ${{ secrets.SSL_PASSWORD }}
     steps:
       - uses: actions/checkout@v2
 
@@ -28,10 +30,10 @@ jobs:
 
       - name: Import Certificate
         run: |
-          chmod +x ./gradlew
-          echo ${{ secrets.SSL_CERTIFICATE }} > ssl-cert.pem
+          echo "$SSL_CERT" > ssl-cert.pem
           ls
-          openssl pkcs12 -export -out ssl-cert.p12 -in ssl-cert.pem -inkey private.key.pem -passout pass:${{ secrets.SSL_PASSWORD }}
+          openssl pkcs12 -export -out ssl-cert.p12 -in ssl-cert.pem -inkey private.key.pem -passout pass:$SSL_PASSWORD
+          chmod +x ./gradlew
           ./gradlew copyByProperty -PfileSrc=ssl-cert.p12 -PpathProp=server.ssl.key-store
 
       - name: Build and push image
