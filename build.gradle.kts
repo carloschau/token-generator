@@ -56,8 +56,14 @@ tasks.withType<KotlinCompile> {
 docker {
     springBootApplication {
         val dockerImageTag = getConfigurationProperty("DOCKER_IMAGE_TAG", "dockerImageTag")
+        val sslPassword = getConfigurationProperty("SSL_PASSWORD", "sslPassword")
+        val args = mutableListOf<String>()
+        if (!sslPassword.isNullOrEmpty())
+            args.add(sslPassword)
+
         maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
         images.set(setOf("${group}/${description}:${dockerImageTag}"))
+        jvmArgs.set(args)
     }
 }
 

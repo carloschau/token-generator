@@ -27,4 +27,4 @@ jobs:
       - name: Build and push image
         run: |
           chmod +x ./gradlew
-          ./gradlew dockerPushImage -PdockerImageTag=${{ github.sha }}
+          ./gradlew dockerPushImage -PdockerImageTag=${{ github.sha }} -PsslPassword=${{ secrets.SSL_PASSWORD }}
