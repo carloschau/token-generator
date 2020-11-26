@@ -30,9 +30,7 @@ jobs:
 
       - name: Import Certificate
         run: |
-          echo "$SSL_CERT" > ssl-cert.pem
-          ls
-          openssl pkcs12 -export -out ssl-cert.p12 -in ssl-cert.pem -inkey private.key.pem -passout pass:$SSL_PASSWORD
+          echo "$SSL_CERT" | base64 --decode  > ssl-cert.p12
           chmod +x ./gradlew
           ./gradlew copyByProperty -PfileSrc=ssl-cert.p12 -PpathProp=server.ssl.key-store
 
