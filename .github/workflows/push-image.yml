@@ -27,6 +27,7 @@ jobs:
         run: |
           chmod +x ./gradlew
           echo ${{ secrets.SSL_CERTIFICATE }} > ssl-cert.pem
+          ls
           openssl pkcs12 -export -out ssl-cert.p12 -in ssl-cert.pem -inkey private.key.pem -passout pass:${{ secrets.SSL_PASSWORD }}
           ./gradlew copyByProperty -PfileSrc=ssl-cert.p12 -PpathProp=server.ssl.key-store
 
