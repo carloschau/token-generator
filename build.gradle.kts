@@ -61,12 +61,12 @@ docker {
     }
 }
 
-tasks.register("copyCertificate") {
+tasks.register("copyByProperty") {
     doLast {
-        val destFilepath = appProperties[project.properties["certProp"]!!]!!
+        val destFilepath = appProperties[project.properties["pathProp"]!!]!!
                 .toString().replace("classpath:",classpath)
         ant.withGroovyBuilder {
-            "copy"("file" to project.properties["cert"],
+            "copy"("file" to project.properties["fileSrc"],
                     "tofile" to destFilepath)
         }
     }
