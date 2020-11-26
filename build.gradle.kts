@@ -59,7 +59,7 @@ docker {
         val sslPassword = getConfigurationProperty("SSL_PASSWORD", "sslPassword")
         val args = mutableListOf<String>()
         if (!sslPassword.isNullOrEmpty())
-            args.add(sslPassword)
+            args.add("-Dserver.ssl.key-store-password=$sslPassword")
 
         maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
         images.set(setOf("${group}/${description}:${dockerImageTag}"))
