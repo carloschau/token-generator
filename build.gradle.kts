@@ -3,6 +3,7 @@
  */
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.Properties
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
 
 plugins {
     id("org.springframework.boot") version "2.1.6.RELEASE"
@@ -53,17 +54,22 @@ tasks.withType<KotlinCompile> {
     }
 }
 
+tasks.named<Dockerfile>("dockerCreateDockerfile") {
+    val envVar = mutableMapOf<String, String>()
+    val sslPassword = getConfigurationProperty("SSL_PASSWORD", "sslPassword")
+
+    if (!sslPassword.isNullOrEmpty())
+        envVar["server.ssl.key-store-password"] = sslPassword
+
+
+    environmentVariable(envVar)
+}
+
 docker {
     springBootApplication {
         val dockerImageTag = getConfigurationProperty("DOCKER_IMAGE_TAG", "dockerImageTag")
-        val sslPassword = getConfigurationProperty("SSL_PASSWORD", "sslPassword")
-        val args = mutableListOf<String>()
-        if (!sslPassword.isNullOrEmpty())
-            args.add("-Dserver.ssl.key-store-password=$sslPassword")
-
         maintainer.set("Carlos Chau 'carlos.chau719@gmail.com'")
         images.set(setOf("${group}/${description}:${dockerImageTag}"))
-        jvmArgs.set(args)
     }
 }
 
